@@ -1,13 +1,18 @@
+import "dotenv/config";
 import { CreateTableCommand, DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
-const client = new DynamoDBClient({ region: "us-east-1" });
+const client = new DynamoDBClient({ region: process.env.AWS_REGION });
 
 async function createTable() {
   const command = new CreateTableCommand({
     TableName: "legacy_events",
-    AttributeDefinitions: [{ AttributeName: "event_id", AttributeType: "S" }],
-    KeySchema: [{ AttributeName: "event_id", KeyType: "HASH" }],
-    BillingMode: "PAY_PER_REQUEST"
+    AttributeDefinitions: [
+      { AttributeName: "event_id", AttributeType: "S" }
+    ],
+    KeySchema: [
+      { AttributeName: "event_id", KeyType: "HASH" }
+    ],
+    BillingMode: "PAY_PER_REQUEST",
   });
 
   try {
@@ -19,3 +24,4 @@ async function createTable() {
 }
 
 createTable();
+
