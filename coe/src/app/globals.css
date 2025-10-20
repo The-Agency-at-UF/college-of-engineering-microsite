@@ -24,3 +24,11 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes scroll {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-33.333%); }
+}
+
+.animate-scroll-slow { animation: scroll 16s linear infinite; }
+.animate-scroll-fast { animation: scroll 11s linear infinite; }
