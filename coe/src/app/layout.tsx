@@ -12,8 +12,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const ibmPlex = IBM_Plex_Sans({
+const ibmPlexSans = IBM_Plex_Sans({
+  variable: "--font-ibm-plex-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -28,12 +30,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      {/* <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${ibmPlexSans.variable} antialiased`}
       >
         {children}
-      </body> */}
-      <body className={ibmPlex.className}>{children}</body>
+      </body>
     </html>
   );
 }
