@@ -1,16 +1,15 @@
 import PhotoGallery from "../components/PhotoGallery";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header Section */}
-      <header className="bg-[#0021A5]">
-        <div className="flex px-10 py-6 border-b border-[#F2A900]"> 
-        </div>
-      </header>
+        <NavBar />
 
       {/* Title Section */}
-      <section className="grid grid-cols-[1.7fr_1fr] h-[70vh] bg-black">
+      <section className="grid grid-cols-[1.7fr_1fr] h-[clamp(300px,70vh,1000px)] bg-black">
         {/* Left side - title */}
         <div className="bg-[#0B2A57] text-white flex items-center px-10 py-10">
           <div>
@@ -28,6 +27,7 @@ export default function Home() {
       <section className="bg-white py-25 px-8">
         
       </section>
+      <Footer />
     </div>
   );
 }
