@@ -30,5 +30,15 @@ body {
   100% { transform: translateY(-33.333%); }
 }
 
-.animate-scroll-slow { animation: scroll 16s linear infinite; }
-.animate-scroll-fast { animation: scroll 11s linear infinite; }
+/* .animate-scroll-slow { animation: scroll 16s linear infinite; }
+.animate-scroll-fast { animation: scroll 11s linear infinite;
+   animation-delay: -10s;; } */
+
+.animate-scroll {
+animation: scroll 20s linear infinite;
+animation-delay: -10s; /* starts halfway through */
+}
+
+.animate-scroll-delay {
+animation: scroll 20s linear infinite;
+}
