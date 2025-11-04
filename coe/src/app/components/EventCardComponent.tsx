@@ -23,14 +23,14 @@ const EventCardComponent: React.FC<EventCardProps> = ({
       {/* Image box */}
       <div className="w-[280px] h-[190px] border-2 border-[#0021A5] bg-gray-300 z-20 relative"></div>
 
-      {/* Rounded rectangle content box (taller at the top) */}
+      {/* Rounded rectangle content box*/}
       <div className="w-full bg-white border-2 border-[#0021A5] rounded-[20px] -mt-30 pt-[130px] pb-[16px] px-4 shadow-md hover:shadow-lg transition-all duration-200">
         {/* Event Title */}
         <h3 className="text-[#002657] text-[16px] font-bold leading-tight">
           {title}
         </h3>
 
-        {/* Date Range — italic */}
+        {/* Date Range */}
         <p className="text-[#0021A5] text-[11px] font-semibold italic mt-[1px]">
           {dateRange}
         </p>
@@ -48,7 +48,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
           {description}
         </p>
 
-        {/* Learn More with vector arrow */}
+        {/* Learn More with arrow */}
         <div className="flex justify-end items-center mt-[4px]">
           <a
             href="#"
