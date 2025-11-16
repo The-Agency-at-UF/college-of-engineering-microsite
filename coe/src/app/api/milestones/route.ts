@@ -36,6 +36,7 @@ export async function POST(req: Request) {
         milestone_date: date,
         department: body.department,
         tags: Array.isArray(body.tags) ? body.tags : [],
+        media_type: body.media_type ?? "image",
         created_at: new Date().toISOString(),
     };
 

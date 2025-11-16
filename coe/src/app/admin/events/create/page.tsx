@@ -1,143 +1,165 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Toast } from "@/app/admin/Toast";
+import { useToast } from "@/app/admin/useToast";
 
 export default function CreateEventPage() {
+  const router = useRouter();
+  const { message, showToast } = useToast();
+
   const [form, setForm] = useState({
     title: "",
     department: "",
-    year: "",
-    themes: "",
-    mediaFormats: "",
     description: "",
+    event_date: "",
+    tags: "",
+    media_type: "image",
   });
 
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  function update(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  function update(
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
   async function submit() {
     setLoading(true);
 
-    // 1. Ask backend for presigned URL
     let uploadedImageUrl = null;
 
+    // STEP 1 — Upload file to S3
     if (image) {
-      const presignRes = await fetch("/api/presign", {
+      const formData = new FormData();
+      formData.append("kind", "event");   // IMPORTANT: event upload bucket
+      formData.append("file", image);
+
+      const uploadRes = await fetch("/api/s3upload", {
         method: "POST",
-        body: JSON.stringify({ fileName: image.name, fileType: image.type }),
+        body: formData,
       });
 
-      const { uploadUrl, finalUrl } = await presignRes.json();
-
-      // Upload to S3
-      await fetch(uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": image.type },
-        body: image,
-      });
-
-      uploadedImageUrl = finalUrl;
+      const uploadJson = await uploadRes.json();
+      uploadedImageUrl = uploadJson.imageUrl;
     }
 
-    // 2. Send event data to AWS backend
+    // STEP 2 — Save event record to DynamoDB
     const awsRes = await fetch("/api/events", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...form,
-        themes: form.themes.split(",").map(t => t.trim()),
-        mediaFormats: form.mediaFormats.split(",").map(t => t.trim()),
-        image: uploadedImageUrl,
+        title: form.title,
+        description: form.description,
+        department: form.department,
+        event_date: form.event_date,
+        image_url: uploadedImageUrl,
+        tags: form.tags.split(",").map(t => t.trim()).filter(Boolean),
+        media_type: form.media_type,
       }),
     });
 
-    if (awsRes.ok) {
-      alert("Event created successfully!");
-      setForm({
-        title: "",
-        department: "",
-        year: "",
-        themes: "",
-        mediaFormats: "",
-        description: "",
-      });
-      setImage(null);
-    } else {
-      alert("Error creating event");
-    }
-
     setLoading(false);
+
+    if (awsRes.ok) {
+      showToast("Event created successfully!");
+      setTimeout(() => router.push("/admin"), 800);
+    } else {
+      showToast("Error creating event");
+    }
   }
 
   return (
     <div>
+
       <h2 className="text-2xl font-bold mb-4">Create Event</h2>
 
       <div className="space-y-4">
         <input
           name="title"
           placeholder="Title"
-          className="border p-2 w-full"
           value={form.title}
           onChange={update}
+          className="border p-2 w-full"
         />
 
         <input
           name="department"
           placeholder="Department"
-          className="border p-2 w-full"
           value={form.department}
           onChange={update}
+          className="border p-2 w-full"
         />
 
         <input
-          name="year"
-          placeholder="Year"
-          className="border p-2 w-full"
-          value={form.year}
+          type="date"
+          name="event_date"
+          value={form.event_date}
           onChange={update}
-        />
-
-        <input
-          name="themes"
-          placeholder="Themes (comma separated)"
           className="border p-2 w-full"
-          value={form.themes}
-          onChange={update}
-        />
-
-        <input
-          name="mediaFormats"
-          placeholder="Media formats (comma separated)"
-          className="border p-2 w-full"
-          value={form.mediaFormats}
-          onChange={update}
         />
 
         <textarea
           name="description"
           placeholder="Description"
-          className="border p-2 w-full"
           value={form.description}
           onChange={update}
+          className="border p-2 w-full"
         />
 
         <input
-          type="file"
-          onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+          name="tags"
+          placeholder="Tags (comma separated)"
+          value={form.tags}
+          onChange={update}
+          className="border p-2 w-full"
         />
+
+        <select
+          name="media_type"
+          value={form.media_type}
+          onChange={update}
+          className="border p-2 w-full"
+        >
+          <option value="image">Image</option>
+          <option value="video">Video</option>
+          <option value="pdf">PDF</option>
+        </select>
+
+        {/* Styled Upload Button + File Name */}
+        <div className="flex flex-col">
+          <label className="bg-[#0021A5] text-white px-4 py-2 rounded cursor-pointer w-fit hover:bg-[#001d42] transition">
+            Choose File
+            <input
+              type="file"
+              className="hidden"
+              onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+            />
+          </label>
+
+          {image && (
+            <p className="text-sm text-green-700 mt-2">
+              Selected file: <span className="font-semibold">{image.name}</span>
+            </p>
+          )}
+        </div>
 
         <button
           onClick={submit}
           disabled={loading}
-          className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition"
         >
           {loading ? "Submitting..." : "Submit Event"}
         </button>
       </div>
+
+      {message && <Toast message={message} />}
     </div>
   );
 }
+
+
+

@@ -29,6 +29,8 @@ export async function POST(req: Request) {
       description: body.description,
       image_url: body.image_url,
       event_date: body.event_date,
+      tags: Array.isArray(body.tags) ? body.tags : [],
+      media_type: body.media_type ?? "image",
       created_at: new Date().toISOString(),
     };
 
