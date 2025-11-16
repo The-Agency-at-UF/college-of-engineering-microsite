@@ -35,7 +35,6 @@ export default function RootLayout({
       >
         {children}
       </body>
-      <body className={ibmPlex.className}>{children}</body>
     </html>
   );
 }
