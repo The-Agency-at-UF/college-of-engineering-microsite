@@ -4,7 +4,8 @@ import EventCardComponent from "./EventCardComponent";
 const EventGridComponent = () => {
   return (
     <section className="w-full py-20 px-8 bg-white"> {/* increased top padding */}
-      <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 place-items-center pt-10"> 
+      {/* <div className="grid grid-cols-3 gap-8 justify-center mx-auto"> */}
+      <div className="grid grid-cols-3 gap-8 justify-center mx-auto max-w-[1300px]">
         <EventCardComponent />
         <EventCardComponent />
         <EventCardComponent />
