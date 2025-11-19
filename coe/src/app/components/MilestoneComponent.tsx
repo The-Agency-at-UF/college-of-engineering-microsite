@@ -37,13 +37,13 @@ export default function MilestoneCard({ imageSrc, title, tags }: MilestoneCardPr
             {tags.map((tag, idx) => (
               <span
                 key={idx}
-                className="px-3 py-1 text-sm font-bold text-white rounded-full bg-[#0021A5]"
+                className="px-3 py-1 text-sm font-bold text-white rounded-full bg-[#0021A5] uppercase"
               >
                 {tag}
               </span>
             ))}
           </div>
-          <h3 className="font-bold text-[#002657] text-lg">{title}</h3>
+          <h3 className="font-bold text-[#002657] text-lg uppercase">{title}</h3>
         </div>
       </div>
     </div>

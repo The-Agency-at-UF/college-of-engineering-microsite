@@ -26,7 +26,7 @@ const EventCardComponent: React.FC<EventCardProps> = ({
       {/* Rounded rectangle content box*/}
       <div className="w-full bg-white border-2 border-[#0021A5] rounded-[20px] -mt-30 pt-[130px] pb-[16px] px-4 shadow-lg hover:shadow-2xl transition-all duration-200">
         {/* Event Title */}
-        <h3 className="text-[#002657] text-[16px] font-bold leading-tight">
+        <h3 className="text-[#002657] text-[16px] font-bold leading-tight uppercase">
           {title}
         </h3>
 
