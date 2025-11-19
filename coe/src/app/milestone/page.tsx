@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import MilestoneCard from "../components/MilestoneComponent";
+import MilestoneGridComponent from "../components/MilestoneGridComponent";
 import Footer from "../components/Footer";
 import NavBar from "../components/NavBar";
 
@@ -110,11 +110,7 @@ export default function MilestonePage() {
 
       {/* Milestone cards*/}
       <section className="items-center justify-center gap-8 py-12">
-        <MilestoneCard
-          imageSrc="/example.jpg"
-          title="MILESTONE TITLE"
-          tags={["THEME", "MEDIA FORMAT"]}
-        />
+       <MilestoneGridComponent />
       </section>
 
       <Footer />
