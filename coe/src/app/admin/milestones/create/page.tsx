@@ -77,13 +77,13 @@ export default function CreateMilestonePage() {
 
       <div className="space-y-4">
 
-        <input name="title" onChange={update} className="border p-2 w-full" placeholder="Title" />
-        <input name="department" onChange={update} className="border p-2 w-full" placeholder="Department" />
-        <input type="date" name="milestone_date" onChange={update} className="border p-2 w-full" />
-        <textarea name="description" onChange={update} className="border p-2 w-full" placeholder="Description" />
-        <input name="tags" onChange={update} className="border p-2 w-full" placeholder="Tags" />
+        <input name="title" onChange={update} className="border p-2 w-full text-[#002657] placeholder:text-[#002657]" placeholder="Title" />
+        <input name="department" onChange={update} className="border p-2 w-full text-[#002657] placeholder:text-[#002657]" placeholder="Department" />
+        <input type="date" name="milestone_date" onChange={update} className="border p-2 w-full text-[#002657] placeholder:text-[#002657]" />
+        <textarea name="description" onChange={update} className="border p-2 w-full text-[#002657] placeholder:text-[#002657]" placeholder="Description" />
+        <input name="tags" onChange={update} className="border p-2 w-full text-[#002657] placeholder:text-[#002657]" placeholder="Tags" />
 
-        <select name="media_type" value={form.media_type} onChange={update} className="border p-2 w-full">
+        <select name="media_type" value={form.media_type} onChange={update} className="border p-2 w-full text-[#002657]">
           <option value="image">Image</option>
           <option value="video">Video</option>
           <option value="pdf">PDF</option>

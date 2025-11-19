@@ -1,12 +1,3 @@
-import Timeline from './components/TimelineComponent';
-import EventGridComponent from "./components/EventGridComponent";
+import Home from "@/app/timeline/page";
 
-export default function Home() {
-  return (
-    <main className="relative min-h-screen bg-gray-100">
-      <Timeline />
-      <EventGridComponent />
-
-    </main>
-  );
-}
+export default Home;

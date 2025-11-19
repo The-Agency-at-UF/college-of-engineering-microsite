@@ -50,7 +50,7 @@ export default function DeleteMilestonePage() {
       <select
         value={selected}
         onChange={(e) => setSelected(e.target.value)}
-        className="border p-2 rounded w-full mb-6"
+        className="border p-2 rounded w-full mb-6 text-[#002657]"
       >
         <option value="">Select a milestone to delete</option>
 
