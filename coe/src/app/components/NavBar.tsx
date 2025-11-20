@@ -37,14 +37,8 @@ export default function NavBar() {
           <Link href="/timeline" className="hover:text-[#F2A900] transition-colors">
             TIMELINE
           </Link>
-          <Link href="/library" className="hover:text-[#F2A900] transition-colors">
-            LIBRARY
-          </Link>
-          <Link href="/map-view" className="hover:text-[#F2A900] transition-colors">
-            MAP VIEW
-          </Link>
-          <Link href="/vision" className="hover:text-[#F2A900] transition-colors">
-            VISION
+          <Link href="/milestone" className="hover:text-[#F2A900] transition-colors">
+          EVENTS
           </Link>
         </nav>
       </div>
