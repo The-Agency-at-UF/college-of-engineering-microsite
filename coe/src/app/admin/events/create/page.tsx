@@ -75,7 +75,7 @@ export default function CreateEventPage() {
   return (
     <div>
 
-      <h2 className="text-2xl font-bold mb-4">Create Event</h2>
+      <h2 className="text-2xl text-[#002657] font-bold mb-4">Create Event</h2>
 
       <div className="space-y-4">
         <input
@@ -83,7 +83,7 @@ export default function CreateEventPage() {
           placeholder="Title"
           value={form.title}
           onChange={update}
-          className="border p-2 w-full"
+          className="border p-2 w-full text-[#002657] placeholder:text-[#002657]"
         />
 
         <input
@@ -91,7 +91,7 @@ export default function CreateEventPage() {
           placeholder="Department"
           value={form.department}
           onChange={update}
-          className="border p-2 w-full"
+          className="border p-2 w-full text-[#002657] placeholder:text-[#002657]"
         />
 
         <input
@@ -99,7 +99,7 @@ export default function CreateEventPage() {
           name="event_date"
           value={form.event_date}
           onChange={update}
-          className="border p-2 w-full"
+          className="border p-2 w-full text-[#002657] placeholder:text-[#002657]"
         />
 
         <textarea
@@ -107,7 +107,7 @@ export default function CreateEventPage() {
           placeholder="Description"
           value={form.description}
           onChange={update}
-          className="border p-2 w-full"
+          className="border p-2 w-full text-[#002657] placeholder:text-[#002657]"
         />
 
         <input
@@ -115,14 +115,14 @@ export default function CreateEventPage() {
           placeholder="Tags (comma separated)"
           value={form.tags}
           onChange={update}
-          className="border p-2 w-full"
+          className="border p-2 w-full text-[#002657] placeholder:text-[#002657]"
         />
 
         <select
           name="media_type"
           value={form.media_type}
           onChange={update}
-          className="border p-2 w-full"
+          className="border p-2 w-full text-[#002657]"
         >
           <option value="image">Image</option>
           <option value="video">Video</option>
