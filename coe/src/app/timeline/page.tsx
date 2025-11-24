@@ -20,8 +20,10 @@ export default function Home() {
 
       {/* ======= TIMELINE BAR + EVENT GRID ======= */}
       <section className="bg-white">
-        <Timeline />
-        <EventGridComponent />
+        <div className="flex">
+          <Timeline />
+          <EventGridComponent />
+        </div>
       </section>
 
       <Footer />

@@ -107,8 +107,8 @@ export default async function AdminPage() {
                   <td className="p-3 border border-[#002657] text-[#002657]">
                     Event
                   </td>
-                  <td className="p-3 border border-[#002657]">{ev.title}</td>
-                  <td className="p-3 border border-[#002657] font-mono text-xs">
+                  <td className="p-3 text-[#002657] border border-[#002657]">{ev.title}</td>
+                  <td className="p-3 text-[#002657] border border-[#002657] font-mono text-xs">
                     {ev.event_id}
                   </td>
                 </tr>
@@ -121,8 +121,8 @@ export default async function AdminPage() {
                   <td className="p-3 border border-[#002657] text-[#002657]">
                     Milestone
                   </td>
-                  <td className="p-3 border border-[#002657]">{m.title}</td>
-                  <td className="p-3 border border-[#002657] font-mono text-xs">
+                  <td className="p-3 border text-[#002657] border-[#002657]">{m.title}</td>
+                  <td className="p-3 border text-[#002657] border-[#002657] font-mono text-xs">
                     {m.milestone_id}
                   </td>
                 </tr>

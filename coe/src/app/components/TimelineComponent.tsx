@@ -7,7 +7,7 @@ export default function Timeline() {
   const labels = ['XXXX', 'XXXX', 'XXXX', 'XXXX', 'XXXX', 'XXXX', 'XXXX', 'XXXX'];
 
   return (
-    <aside className="fixed left-15 top-1/2 -translate-y-1/2 flex flex-col items-center z-50">
+    <aside className="p-16 flex flex-col items-center z-50">
       {/* Main vertical line */}
       <div
         className="relative w-[6px] h-[500px] flex flex-col justify-between"
