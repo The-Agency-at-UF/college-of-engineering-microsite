@@ -37,9 +37,11 @@ const MilestoneGridComponent = () => {
         {allMilestones.map((milestone: any) => (
           <MilestoneCard
             key={milestone.milestone_id}
+            id={milestone.milestone_id}
             imageSrc={milestone.image_url}
             title={milestone.title}
             tags={milestone.tags || []}
+            description={milestone.description}
           />
         ))}
       </div>
