@@ -25,15 +25,15 @@ export const MILESTONE_FILTER_CONFIGS = [
     label: "THEMES",
     multiSelect: true,
     options: [
-      { id: "theme_1", label: "THEME", value: "innovation" },
-      { id: "theme_2", label: "THEME", value: "research" },
-      { id: "theme_3", label: "THEME", value: "education" },
-      { id: "theme_4", label: "THEME", value: "infrastructure" },
-      { id: "theme_5", label: "THEME", value: "technology" },
-      { id: "theme_6", label: "THEME", value: "sustainability" },
-      { id: "theme_7", label: "THEME", value: "healthcare" },
-      { id: "theme_8", label: "THEME", value: "aerospace" },
-      { id: "theme_9", label: "THEME", value: "materials" }
+      { id: "theme_1", label: "INNOVATION", value: "innovation" },
+      { id: "theme_2", label: "RESEARCH", value: "research" },
+      { id: "theme_3", label: "EDUCATION", value: "education" },
+      { id: "theme_4", label: "INFRASTRUCTURE", value: "infrastructure" },
+      { id: "theme_5", label: "TECHNOLOGY", value: "technology" },
+      { id: "theme_6", label: "SUSTAINABILITY", value: "sustainability" },
+      { id: "theme_7", label: "HEALTHCARE", value: "healthcare" },
+      { id: "theme_8", label: "AEROSPACE", value: "aerospace" },
+      { id: "theme_9", label: "MATERIALS", value: "materials" }
     ]
   },
   {
@@ -41,12 +41,12 @@ export const MILESTONE_FILTER_CONFIGS = [
     label: "MEDIA FORMATS",
     multiSelect: true,
     options: [
-      { id: "media_1", label: "MEDIA FORMAT", value: "image" },
-      { id: "media_2", label: "MEDIA FORMAT", value: "video" },
-      { id: "media_3", label: "MEDIA FORMAT", value: "document" },
-      { id: "media_4", label: "MEDIA FORMAT", value: "audio" },
-      { id: "media_5", label: "MEDIA FORMAT", value: "interactive" },
-      { id: "media_6", label: "MEDIA FORMAT", value: "presentation" }
+      { id: "media_1", label: "IMAGE", value: "image" },
+      { id: "media_2", label: "VIDEO", value: "video" },
+      { id: "media_3", label: "DOCUMENT", value: "document" },
+      { id: "media_4", label: "AUDIO", value: "audio" },
+      { id: "media_5", label: "INTERACTIVE", value: "interactive" },
+      { id: "media_6", label: "PRESENTATION", value: "presentation" }
     ]
   }
 ];

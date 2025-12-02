@@ -187,6 +187,7 @@ export default function MilestonePage() {
           filterState={filterState}
           onFilterChange={handleFilterChange}
           filterFunction={filterMilestones}
+          filterControlsClassName="flex gap-4 mb-6 justify-end"
         >
           {(filteredMilestones) => (
             <div className="grid gap-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 place-items-center">

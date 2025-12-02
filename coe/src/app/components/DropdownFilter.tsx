@@ -80,22 +80,22 @@ export const DropdownFilter: React.FC<DropdownFilterProps> = ({
             onClick={() => setIsOpen(false)}
           />
           
-          {/* Dropdown Content */}
-          <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-20 min-w-[280px] max-w-[400px]">
+          {/* Dropdown Content - Updated to match image styling */}
+          <div className="absolute top-full right-0 mt-2 bg-white border-2 border-[#0021A5] rounded-lg shadow-lg z-20 min-w-[320px]">
             {/* Header */}
-            <div className="p-4 border-b border-gray-200">
-              <div className="text-sm font-medium text-gray-700 mb-3">Select Topics</div>
+            <div className="p-4 border-b-2 border-[#0021A5]">
+              <div className="text-sm font-semibold text-[#0021A5] mb-3">Select Topics</div>
               
-              {/* Options Grid */}
+              {/* Options Grid - 3 columns to match image */}
               <div className="grid grid-cols-3 gap-2">
                 {config.options.map((option) => (
                   <button
                     key={option.id}
                     onClick={() => toggleOption(option.value)}
-                    className={`px-3 py-2 text-sm rounded transition-colors ${
+                    className={`px-3 py-2 text-xs font-medium rounded-full transition-colors border ${
                       selectedValues.includes(option.value)
-                        ? 'bg-[#0021A5] text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? 'bg-[#0021A5] text-white border-[#0021A5]'
+                        : 'bg-white text-[#0021A5] border-[#0021A5] hover:bg-[#0021A5] hover:text-white'
                     }`}
                   >
                     {option.label}
@@ -106,16 +106,16 @@ export const DropdownFilter: React.FC<DropdownFilterProps> = ({
 
             {/* Footer Actions */}
             <div className="p-4 flex justify-between items-center">
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <button
                   onClick={selectAll}
-                  className="text-[#0021A5] text-sm hover:underline"
+                  className="text-[#0021A5] text-sm font-medium hover:underline"
                 >
                   Select All
                 </button>
                 <button
                   onClick={deselectAll}
-                  className="text-[#0021A5] text-sm hover:underline"
+                  className="text-[#0021A5] text-sm font-medium hover:underline"
                 >
                   Deselect All
                 </button>
@@ -123,7 +123,7 @@ export const DropdownFilter: React.FC<DropdownFilterProps> = ({
               
               <button
                 onClick={applyFilters}
-                className="bg-[#0021A5] text-white px-4 py-2 rounded text-sm hover:bg-[#001a85] transition-colors"
+                className="bg-[#0021A5] text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-[#001a85] transition-colors"
               >
                 Apply
               </button>
