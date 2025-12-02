@@ -12,6 +12,7 @@ import { Milestone } from "../lib/fakeApiData";
 export default function MilestonePage() {
   const { milestones, loading, error } = useMilestones();
   const [filterState, setFilterState] = useState<FilterState>({});
+  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
 
   const handleFilterChange = (filterId: string, selectedValues: string[]) => {
     setFilterState(prev => ({
@@ -20,9 +21,18 @@ export default function MilestonePage() {
     }));
   };
 
-  // Define how to filter milestones based on selected filters
+  const handleDepartmentClick = (department: string) => {
+    setSelectedDepartment(department);
+  };
+
+  // Define how to filter milestones based on selected filters AND department
   const filterMilestones = (milestone: Milestone, filters: FilterState): boolean => {
-    // If no filters selected, show all milestones
+    // First check department filter
+    if (selectedDepartment && milestone.department?.toUpperCase() !== selectedDepartment) {
+      return false;
+    }
+
+    // If no other filters selected, show all milestones (filtered by department if selected)
     if (Object.keys(filters).length === 0) return true;
 
     // Check themes filter
@@ -78,7 +88,7 @@ export default function MilestonePage() {
         </div>
       </section>
 
-      {/* Department Carousel - Restore full department list with scroll */}
+      {/* Department Carousel - Now clickable for filtering */}
       <section className="relative mt-10">
         {/* Scroll Arrows */}
         <div className="absolute right-8 -top-6 flex gap-6 z-20">
@@ -115,7 +125,19 @@ export default function MilestonePage() {
           </button>
         </div>
 
-        {/* Scrollable Department Row */}
+        {/* Clear Filter Button */}
+        {selectedDepartment && (
+          <div className="absolute left-8 -top-6 z-20">
+            <button
+              onClick={() => setSelectedDepartment(null)}
+              className="bg-[#FA4616] text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-[#e63e0f] transition-colors"
+            >
+              Show All Departments
+            </button>
+          </div>
+        )}
+
+        {/* Scrollable Department Row - Now clickable */}
         <div
           id="dept-carousel"
           className="flex overflow-x-auto gap-6 py-4 no-scrollbar scroll-smooth px-8" 
@@ -128,15 +150,31 @@ export default function MilestonePage() {
           }}
         >
           {["AG BIO", "BME", "CHEM", "CISE", "CIVIL", "EEE", "ESE", "ISE", "MAE", "MSE", "PHY", "ABE"].map((dept, idx) => (
-            <div
+            <button
               key={idx}
-              className="flex-shrink-0 w-80 h-50 bg-[#002657B2] bg-opacity-70 text-white text-6xl italic flex items-center justify-center rounded-xl cursor-pointer hover:bg-[#002657] transition"
+              onClick={() => handleDepartmentClick(dept)}
+              className={`flex-shrink-0 w-80 h-50 text-white text-6xl italic flex items-center justify-center rounded-xl transition ${
+                selectedDepartment === dept
+                  ? 'bg-[#FA4616] shadow-lg' 
+                  : 'bg-[#002657B2] bg-opacity-70 hover:bg-[#002657] cursor-pointer'
+              }`}
             >
               {dept}
-            </div>
+            </button>
           ))}
         </div>
       </section>
+
+      {/* Selected Department Indicator */}
+      {selectedDepartment && (
+        <section className="px-8 mt-4">
+          <div className="text-center">
+            <span className="text-[#002657] text-lg font-medium">
+              Showing milestones from: <span className="font-bold text-[#FA4616]">{selectedDepartment}</span>
+            </span>
+          </div>
+        </section>
+      )}
 
       {/* Divider */}
       <div className="h-[4px] bg-[#FA4616] mx-8 mt-4 rounded-full" />
@@ -163,7 +201,10 @@ export default function MilestonePage() {
                 ))
               ) : (
                 <div className="col-span-full text-center py-12 text-[#002657] text-lg">
-                  No milestones found matching the selected filters
+                  {selectedDepartment ? 
+                    `No milestones found for ${selectedDepartment} ${Object.keys(filterState).length > 0 ? 'matching the selected filters' : ''}` :
+                    'No milestones found matching the selected filters'
+                  }
                 </div>
               )}
             </div>

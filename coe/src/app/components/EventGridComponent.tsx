@@ -1,12 +1,16 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import EventCardComponent from "./EventCardComponent";
 import { Event } from "../lib/fakeApiData";
 import { ApiClient } from "../lib/apiClient";
 import { API_CONFIG } from "../lib/apiConfig";
 
-const EventGridComponent = () => {
+interface EventGridComponentProps {
+  selectedDepartment?: string | null;
+}
+
+const EventGridComponent = ({ selectedDepartment }: EventGridComponentProps) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +31,15 @@ const EventGridComponent = () => {
     fetchEvents();
   }, []);
 
+  // Filter events by selected department
+  const filteredEvents = useMemo(() => {
+    if (!selectedDepartment) return events;
+    
+    return events.filter(event => 
+      event.department.toUpperCase() === selectedDepartment.toUpperCase()
+    );
+  }, [events, selectedDepartment]);
+
   if (loading) {
     return (
       <div className="w-full text-center py-12 text-[#002657] text-lg font-medium">
@@ -46,16 +59,16 @@ const EventGridComponent = () => {
   return (
     <section className="w-full py-20 px-8 bg-white">
       {/* Show banner when using fake data */}
-      {API_CONFIG.USE_FAKE_API && API_CONFIG.SHOW_FAKE_DATA_BANNER && (
+      {/* {API_CONFIG.USE_FAKE_API && API_CONFIG.SHOW_FAKE_DATA_BANNER && (
         <div className="mb-8 p-4 bg-blue-100 border border-blue-400 rounded-lg text-blue-800 max-w-4xl mx-auto">
           <p className="font-semibold">🧪 Development Mode</p>
           <p className="text-sm">Using fake data. Set USE_FAKE_API to false in apiConfig.ts to connect to AWS.</p>
         </div>
-      )}
+      )} */}
 
       <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 place-items-center pt-10">
-        {events.length > 0 ? (
-          events.map((event) => (
+        {filteredEvents.length > 0 ? (
+          filteredEvents.map((event) => (
             <EventCardComponent
               key={event.event_id}
               title={event.title}
@@ -66,7 +79,10 @@ const EventGridComponent = () => {
           ))
         ) : (
           <div className="col-span-full text-center py-12 text-[#002657] text-lg">
-            No events available
+            {selectedDepartment ? 
+              `No events available for ${selectedDepartment}` : 
+              'No events available'
+            }
           </div>
         )}
       </div>
