@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { DropdownFilter, FilterConfig } from "./DropdownFilter";
 
 export interface FilterState {
@@ -26,17 +26,45 @@ export function FilterSystem<T>({
   className = "",
   filterControlsClassName = "flex gap-4 mb-6" // Default left alignment
 }: FilterSystemProps<T>) {
-  // Apply all filters to the items
+  // Separate state for pending (not yet applied) filter selections
+  const [pendingFilterState, setPendingFilterState] = useState<FilterState>({});
+
+  // Apply all APPLIED filters to the items (not pending ones)
   const filteredItems = items.filter(item => filterFunction(item, filterState));
 
-  // Function to remove a specific filter value
+  // Function to handle pending filter changes (before Apply is clicked)
+  const handlePendingFilterChange = (filterId: string, selectedValues: string[]) => {
+    setPendingFilterState(prev => ({
+      ...prev,
+      [filterId]: selectedValues
+    }));
+  };
+
+  // Function to apply pending filters
+  const applyPendingFilters = () => {
+    Object.entries(pendingFilterState).forEach(([filterId, values]) => {
+      onFilterChange(filterId, values);
+    });
+    setPendingFilterState({}); // Clear pending state after applying
+  };
+
+  // Function to cancel pending changes for a specific filter
+  const cancelPendingChanges = (filterId: string) => {
+    setPendingFilterState(prev => {
+      const updated = { ...prev };
+      delete updated[filterId];
+      return updated;
+    });
+  };
+
+  // Function to remove a specific applied filter value
   const removeFilterValue = (filterId: string, valueToRemove: string) => {
     const currentValues = filterState[filterId] || [];
     const newValues = currentValues.filter(value => value !== valueToRemove);
     onFilterChange(filterId, newValues);
   };
 
-  // Get selected filter badges
+  // Get selected filter badges (from applied filters only)
   const getSelectedFilterBadges = () => {
     const badges: Array<{ filterId: string; value: string; label: string }> = [];
     
@@ -59,6 +87,9 @@ export function FilterSystem<T>({
 
   const selectedBadges = getSelectedFilterBadges();
 
+  // Check if there are pending changes to show Apply button
+  const hasPendingChanges = Object.keys(pendingFilterState).length > 0;
+
   return (
     <div className={className}>
       {/* Filter Controls */}
@@ -67,8 +98,11 @@ export function FilterSystem<T>({
           <DropdownFilter
             key={config.id}
             config={config}
-            selectedValues={filterState[config.id] || []}
-            onSelectionChange={onFilterChange}
+            selectedValues={pendingFilterState[config.id] || filterState[config.id] || []}
+            onSelectionChange={handlePendingFilterChange}
+            onApply={applyPendingFilters}
+            onCancel={() => cancelPendingChanges(config.id)}
+            hasPendingChanges={hasPendingChanges}
           />
         ))}
       </div>
