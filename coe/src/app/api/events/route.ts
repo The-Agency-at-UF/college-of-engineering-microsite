@@ -1,49 +1,88 @@
-import { NextResponse } from "next/server";
-import { docClient } from "@/app/lib/dynamoClient";
-import { PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
-import { v4 as uuidv4 } from "uuid";
+import { NextRequest, NextResponse } from "next/server";
+import { fakeEvents } from "../../lib/fakeApiData";
 
-const TABLE_NAME = process.env.DYNAMO_TABLE_NAME!;
-
-// GET all events
-export async function GET() {
+// Fake API that behaves exactly like AWS backend
+export async function GET(request: NextRequest) {
   try {
-    const data = await docClient.send(new ScanCommand({ TableName: TABLE_NAME }));
-    return NextResponse.json(data.Items ?? []);
-  } catch (err) {
-    console.error("DynamoDB GET error:", err);
-    return NextResponse.json({ error: "Failed to fetch items" }, { status: 500 });
+    // Simulate network delay like real API
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    const { searchParams } = new URL(request.url);
+    
+    // Support query parameters for filtering/searching
+    const department = searchParams.get('department');
+    const search = searchParams.get('search');
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const offset = parseInt(searchParams.get('offset') || '0');
+
+    let filteredEvents = [...fakeEvents];
+
+    // Filter by department if specified
+    if (department && department !== 'ALL') {
+      filteredEvents = filteredEvents.filter(event => 
+        event.department.toUpperCase() === department.toUpperCase()
+      );
+    }
+
+    // Search in title and description if specified
+    if (search) {
+      const searchTerm = search.toLowerCase();
+      filteredEvents = filteredEvents.filter(event =>
+        event.title.toLowerCase().includes(searchTerm) ||
+        event.description.toLowerCase().includes(searchTerm) ||
+        event.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+      );
+    }
+
+    // Apply pagination
+    const paginatedEvents = filteredEvents.slice(offset, offset + limit);
+
+    // Return AWS-style response
+    return NextResponse.json({
+      events: paginatedEvents,
+      total: filteredEvents.length,
+      offset: offset,
+      limit: limit,
+      hasMore: offset + limit < filteredEvents.length
+    });
+
+  } catch (error) {
+    console.error("Events API Error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch events", events: [] },
+      { status: 500 }
+    );
   }
 }
 
-// POST new event
-export async function POST(req: Request) {
+// Handle POST for creating new events (fake implementation)
+export async function POST(request: NextRequest) {
   try {
-    const body = await req.json();
-
-    // ensure event_id exists
-    const item = {
-      event_id: body.event_id || uuidv4(),
-      title: body.title,
-      department: body.department,
-      description: body.description,
-      image_url: body.image_url,
-      event_date: body.event_date,
-      tags: Array.isArray(body.tags) ? body.tags : [],
-      media_type: body.media_type ?? "image",
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    const eventData = await request.json();
+    
+    // Generate fake ID and timestamps
+    const newEvent = {
+      ...eventData,
+      event_id: `evt_${Date.now()}`,
       created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
 
-    await docClient.send(
-      new PutCommand({
-        TableName: TABLE_NAME,
-        Item: item,
-      })
-    );
+    // In real app, this would save to database
+    fakeEvents.push(newEvent);
 
-    return NextResponse.json({ success: true, item });
-  } catch (err) {
-    console.error("DynamoDB POST error:", err);
-    return NextResponse.json({ error: "Failed to insert item" }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      event: newEvent,
+      message: "Event created successfully"
+    });
+
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create event", success: false },
+      { status: 500 }
+    );
   }
 }
