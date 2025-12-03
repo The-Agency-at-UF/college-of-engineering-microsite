@@ -36,12 +36,12 @@ body {
    animation-delay: -10s;; } */
 
 .animate-scroll {
-animation: scroll 20s linear infinite;
+animation: scroll 400s linear infinite;
 animation-delay: -10s; /* starts halfway through */
 }
 
 .animate-scroll-delay {
-animation: scroll 20s linear infinite;
+animation: scroll 500s linear infinite;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
