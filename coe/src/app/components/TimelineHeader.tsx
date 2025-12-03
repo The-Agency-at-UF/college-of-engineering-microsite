@@ -12,9 +12,6 @@ export default function TimelineHeader() {
             <h1 className="text-[clamp(50px,5vw,78px)] font-bold">
               LEGACY
             </h1>
-            <h2 className="text-[clamp(70px,8vw,115px)] font-bold -mt-6">
-              115
-            </h2>
             <h3 className="text-[clamp(10px,1.7vw,30px)] font-bold leading-[1]">
               ENGINEERING OUR LEGACY,<br />BUILDING THE FUTURE
             </h3>
