@@ -6,7 +6,7 @@ import MilestoneCard from "./MilestoneComponent"; // adjust path if needed
 const MilestoneGridComponent = () => {
   const [allMilestones, setAllMilestones] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMilestones = async () => {
@@ -33,7 +33,7 @@ const MilestoneGridComponent = () => {
         setAllMilestones(milestonesArray);
       } catch (error) {
         console.error("❌ Failed to fetch milestones:", error);
-        setError(error.message);
+        setError(error instanceof Error ? error.message : "An unknown error occurred");
         setAllMilestones([]); // Ensure it's still an array on error
       } finally {
         setLoading(false);
