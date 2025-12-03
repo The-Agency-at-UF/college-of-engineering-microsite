@@ -7,7 +7,10 @@ export interface Milestone {
   milestone_date: string;
   department: string;
   tags?: string[];
+  themes?: string[];
+  media_format?: string;
   created_at: string;
+  updated_at: string;
 }
 
 // Event interface for consistency
@@ -20,6 +23,7 @@ export interface Event {
   department: string;
   tags?: string[];
   created_at: string;
+  updated_at: string;
 }
 
 export const mockMilestones: Milestone[] = [
@@ -30,7 +34,8 @@ export const mockMilestones: Milestone[] = [
     milestone_date: "1925-09-15",
     department: "CIVIL",
     tags: ["infrastructure", "historic"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   },
   {
     milestone_id: "2", 
@@ -39,7 +44,8 @@ export const mockMilestones: Milestone[] = [
     milestone_date: "1968-01-20",
     department: "CISE",
     tags: ["computing", "education"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   },
   {
     milestone_id: "3",
@@ -48,7 +54,8 @@ export const mockMilestones: Milestone[] = [
     milestone_date: "1975-08-30",
     department: "BME",
     tags: ["biomedical", "interdisciplinary"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   },
   {
     milestone_id: "4",
@@ -57,7 +64,8 @@ export const mockMilestones: Milestone[] = [
     milestone_date: "1982-03-12",
     department: "CHEM",
     tags: ["laboratory", "innovation"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   },
   {
     milestone_id: "5",
@@ -66,7 +74,8 @@ export const mockMilestones: Milestone[] = [
     milestone_date: "1988-06-05",
     department: "MSE",
     tags: ["research", "materials"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   },
   {
     milestone_id: "6",
@@ -75,7 +84,8 @@ export const mockMilestones: Milestone[] = [
     milestone_date: "2005-04-18",
     department: "AG BIO",
     tags: ["agriculture", "sustainability"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   },
   {
     milestone_id: "7",
@@ -84,7 +94,8 @@ export const mockMilestones: Milestone[] = [
     milestone_date: "2012-11-08",
     department: "MAE",
     tags: ["aerospace", "mechanical"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   }
 ];
 
@@ -96,7 +107,8 @@ export const mockEvents: Event[] = [
     event_date: "1965",
     department: "CISE",
     tags: ["computers", "technology"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   },
   {
     event_id: "2", 
@@ -105,7 +117,8 @@ export const mockEvents: Event[] = [
     event_date: "1972",
     department: "BME",
     tags: ["biomedical", "healthcare"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   },
   {
     event_id: "3",
@@ -114,7 +127,8 @@ export const mockEvents: Event[] = [
     event_date: "1985",
     department: "CHEM",
     tags: ["sustainability", "competition"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   },
   {
     event_id: "4",
@@ -123,7 +137,8 @@ export const mockEvents: Event[] = [
     event_date: "1990",
     department: "MSE",
     tags: ["materials", "research"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   },
   {
     event_id: "5",
@@ -132,7 +147,8 @@ export const mockEvents: Event[] = [
     event_date: "1995",
     department: "CIVIL",
     tags: ["infrastructure", "innovation"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   },
   {
     event_id: "6",
@@ -141,6 +157,7 @@ export const mockEvents: Event[] = [
     event_date: "2000",
     department: "EEE",
     tags: ["power", "electrical"],
-    created_at: "2024-01-01"
+    created_at: "2024-01-01",
+    updated_at: "2024-01-01"
   }
 ];
