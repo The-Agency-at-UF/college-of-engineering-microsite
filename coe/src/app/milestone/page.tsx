@@ -249,8 +249,8 @@ export default function MilestonePage() {
               {filteredMilestones.length > 0 ? (
                 filteredMilestones.map((milestone) => (
                   <MilestoneCard
-                    key={milestone.milestone_id}
-                    id={milestone.milestone_id}
+                    key={milestone.milestone_id || Math.random()}
+                    id={milestone.milestone_id || String(Math.random())}
                     imageSrc={milestone.image_url || "/images/pic1.jpg"}
                     title={milestone.title}
                     tags={milestone.themes || []}
