@@ -33,7 +33,7 @@ export default function Home() {
       {/* ======= TIMELINE BAR + EVENT GRID ======= */}
       <section className="bg-white">
         <div className="flex">
-          <Timeline />
+          {/* <Timeline /> */}
           <EventGridComponent selectedDepartment={selectedDepartment} />
         </div>
       </section>

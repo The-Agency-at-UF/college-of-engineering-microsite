@@ -32,7 +32,7 @@ export default function ExcellenceSection({ selectedDepartment, onDepartmentChan
         <section className = "flex flex-col items-center justify-center gap-8 pt-[clamp(15px,3vw,50px)]">
             {/* Blue Banner area */}
             <div className="bg-[#0021A5] text-white text-center font-bold rounded-full px-16 py-4 text-[clamp(13px,3vw,40px)] w-[min(83%,1200px)]" >
-                Defining Excellence Since XXXX
+                Defining Excellence Since 1910
             </div>
 
             {/* Department buttons - Now functional with correct mapping */}

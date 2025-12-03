@@ -17,7 +17,7 @@ export default function DeleteEventPage() {
   useEffect(() => {
     fetch("/api/events")
       .then((r) => r.json())
-      .then((data) => setEvents(data));
+      .then((data) => setEvents(data.events || []));
   }, []);
 
   async function deleteEvent() {
@@ -49,7 +49,7 @@ export default function DeleteEventPage() {
   return (
     <div>
 
-      <h2 className="text-2xl font-bold mb-6">Delete Event</h2>
+      <h2 className="text-2xl text-[#002657] font-bold mb-4">Delete Event</h2>
 
       {/* Dropdown */}
       <select
