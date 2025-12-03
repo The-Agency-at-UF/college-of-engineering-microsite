@@ -2,7 +2,7 @@
 import React from "react";
 import { COMMON_STYLES } from "../../lib/constants";
 import EventCardComponent from "../EventCardComponent";
-import { Milestone, Event } from "../../lib/mockData";
+import { Milestone, Event } from "../../lib/fakeApiData";
 
 interface MilestoneGridProps {
   items: Milestone[];
