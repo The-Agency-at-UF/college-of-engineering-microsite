@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import MilestoneGridComponent from "../components/MilestoneGridComponent";
 import Footer from "../components/Footer";
 import NavBar from "../components/NavBar";
 import MilestoneCard from "../components/MilestoneComponent";
@@ -13,6 +16,8 @@ export default function MilestonePage() {
   const { milestones, loading, error } = useMilestones();
   const [filterState, setFilterState] = useState<FilterState>({});
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [departmentImages, setDepartmentImages] = useState<string[]>([]);
 
   const handleFilterChange = (filterId: string, selectedValues: string[]) => {
     setFilterState(prev => ({
@@ -76,6 +81,24 @@ export default function MilestonePage() {
       </main>
     );
   }
+
+  // Fetch department images
+  useEffect(() => {
+    fetch("/api/departments")
+      .then((res) => res.json())
+      .then((data: string[]) => setDepartmentImages(data))
+      .catch(() => setDepartmentImages([]));
+  }, []);
+
+  // Match department names to images
+  const getDeptImage = (dept: string) => {
+  return departmentImages.find((img) =>
+    img.toLowerCase().replace(/\s/g, "") // remove spaces
+       .includes(dept.toLowerCase().replace(/\s/g, ""))
+  ) || null;
+};
+
+
 
   return (
     <main className="min-h-screen flex flex-col bg-white">

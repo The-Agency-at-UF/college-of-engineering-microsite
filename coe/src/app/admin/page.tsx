@@ -82,6 +82,20 @@ export default async function AdminPage() {
         >
           Delete Milestone
         </Link>
+
+        <Link
+          href="/admin/events/edit"
+          className="bg-[#bdd9e4] text-black text-center px-6 py-4 rounded-full font-bold hover:bg-[#5e8892] transition shadow"
+        >
+          Edit Event
+        </Link>
+
+        <Link
+          href="/admin/milestones/edit"
+          className="bg-[#bdd9e4] text-black text-center px-6 py-4 rounded-full font-bold hover:bg-[#5e8892] transition shadow"
+        >
+          Edit Milestone
+        </Link>
       </div>
 
       {/* Data Table */}
