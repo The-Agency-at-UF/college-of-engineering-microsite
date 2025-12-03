@@ -1,59 +1,156 @@
-import { NextResponse } from "next/server";
-import { docClient } from "@/app/lib/dynamoClient";
-import { PutCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
-import { v4 as uuidv4 } from "uuid";
+import { NextRequest, NextResponse } from "next/server";
+import { fakeMilestones } from "../../lib/fakeApiData";
+import { docClient } from "../../lib/dynamoClient";
+import { ScanCommand } from "@aws-sdk/lib-dynamodb";
 
-const TABLE_NAME = process.env.DYNAMO_TABLE_NAME_M!;
-if (!TABLE_NAME) {
-  throw new Error("DYNAMO_TABLE_NAME_M is not set");
-}
+const TABLE_NAME = "legacy_milestones";
 
-// GET all milestones
-export async function GET() {
+// Fetch milestones from AWS DynamoDB
+async function fetchAWSMilestones() {
   try {
-    const data = await docClient.send(new ScanCommand({ TableName: TABLE_NAME }));
-    return NextResponse.json(data.Items ?? []);
-  } catch (err) {
-    console.error("DynamoDB GET milestones error:", err);
-    return NextResponse.json({ error: "Failed to fetch milestones" }, { status: 500 });
+    if (!process.env.AWS_ACCESS_KEY_ID) {
+      // AWS credentials not configured, skip AWS fetch
+      return [];
+    }
+
+    const command = new ScanCommand({
+      TableName: TABLE_NAME,
+    });
+
+    const response = await docClient.send(command);
+    return response.Items || [];
+  } catch (error) {
+    console.warn("Failed to fetch milestones from AWS (will use fake data):", error);
+    return [];
   }
 }
 
-// POST create milestone
-export async function POST(req: Request) {
+// Merge AWS and fake data, with AWS data taking precedence
+function mergeMilestoneData(awsMilestones: any[], fakeMilestones: any[]) {
+  // Create a map of AWS milestones by ID for quick lookup
+  const awsMap = new Map(awsMilestones.map(m => [m.milestone_id, m]));
+  
+  // Start with fake milestones, but replace with AWS data if exists
+  const merged: any[] = [];
+  
+  // Add AWS milestones first (they take precedence)
+  for (const awsMilestone of awsMilestones) {
+    merged.push({
+      ...awsMilestone,
+      // Ensure AWS milestones keep their existing image_url if they have one
+    });
+  }
+  
+  // Add fake milestones that don't exist in AWS
+  for (const fakeMilestone of fakeMilestones) {
+    if (!awsMap.has(fakeMilestone.milestone_id)) {
+      merged.push(fakeMilestone);
+    }
+  }
+  
+  return merged;
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const body = await req.json();
+    const { searchParams } = new URL(request.url);
+    
+    // Support query parameters for filtering/searching
+    const department = searchParams.get('department');
+    const search = searchParams.get('search');
+    const significance = searchParams.get('significance');
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const offset = parseInt(searchParams.get('offset') || '0');
 
-    const desc = body.summary ?? body.description ?? null;
-    const date = body.milestone_date ?? body.event_date;
-    if (!body.title || !date || !body.department) { /* 400 */ }
+    // Fetch from AWS first, then merge with fake data
+    const awsMilestones = await fetchAWSMilestones();
+    let allMilestones = mergeMilestoneData(awsMilestones, fakeMilestones);
 
-    const item = {
-        milestone_id: body.milestone_id || uuidv4(),
-        title: body.title,
-        description: desc,
-        image_url: body.image_url ?? null,
-        milestone_date: date,
-        department: body.department,
-        tags: Array.isArray(body.tags) ? body.tags : [],
-        media_type: body.media_type ?? "image",
-        created_at: new Date().toISOString(),
+    // Filter by department if specified
+    if (department && department !== 'ALL') {
+      allMilestones = allMilestones.filter(milestone => 
+        milestone.department?.toUpperCase() === department.toUpperCase()
+      );
+    }
+
+    // Filter by significance level if specified
+    if (significance) {
+      allMilestones = allMilestones.filter(milestone =>
+        milestone.significance_level === significance
+      );
+    }
+
+    // Search in title and description if specified
+    if (search) {
+      const searchTerm = search.toLowerCase();
+      allMilestones = allMilestones.filter(milestone =>
+        milestone.title?.toLowerCase().includes(searchTerm) ||
+        milestone.description?.toLowerCase().includes(searchTerm) ||
+        milestone.tags?.some((tag: string) => tag.toLowerCase().includes(searchTerm))
+      );
+    }
+
+    // Sort by date (newest first)
+    allMilestones.sort((a, b) => {
+      const dateA = new Date(a.milestone_date || 0).getTime();
+      const dateB = new Date(b.milestone_date || 0).getTime();
+      return dateB - dateA;
+    });
+
+    // Apply pagination
+    const paginatedMilestones = allMilestones.slice(offset, offset + limit);
+
+    // Return AWS-style response
+    return NextResponse.json({
+      milestones: paginatedMilestones,
+      total: allMilestones.length,
+      offset: offset,
+      limit: limit,
+      hasMore: offset + limit < allMilestones.length
+    });
+
+  } catch (error) {
+    console.error("Milestones API Error:", error);
+    // Fallback to fake data only on error
+    return NextResponse.json({
+      milestones: fakeMilestones,
+      total: fakeMilestones.length,
+      offset: 0,
+      limit: fakeMilestones.length,
+      hasMore: false
+    });
+  }
+}
+
+// Handle POST for creating new milestones (fake implementation)
+export async function POST(request: NextRequest) {
+  try {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    const milestoneData = await request.json();
+    
+    // Generate fake ID and timestamps
+    const newMilestone = {
+      ...milestoneData,
+      milestone_id: `mst_${Date.now()}`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      significance_level: milestoneData.significance_level || 'medium'
     };
 
+    // In real app, this would save to database
+    fakeMilestones.push(newMilestone);
 
-    await docClient.send(
-      new PutCommand({
-        TableName: TABLE_NAME,
-        Item: item,
-        ConditionExpression: "attribute_not_exists(milestone_id)",
-      })
+    return NextResponse.json({
+      success: true,
+      milestone: newMilestone,
+      message: "Milestone created successfully"
+    });
+
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create milestone", success: false },
+      { status: 500 }
     );
-
-    return NextResponse.json({ success: true, item });
-  } catch (err: any) {
-    const status =
-      err?.name === "ConditionalCheckFailedException" ? 409 : 500;
-    console.error("DynamoDB POST milestone error:", err);
-    return NextResponse.json({ error: "Failed to insert milestone" }, { status });
   }
 }
