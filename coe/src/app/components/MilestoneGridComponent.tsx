@@ -67,6 +67,7 @@ const MilestoneGridComponent = () => {
           allMilestones.map((milestone: any) => (
             <MilestoneCard
               key={milestone.milestone_id || Math.random()}
+              id={milestone.milestone_id || String(Math.random())}
               imageSrc={milestone.image_url || "/images/pic1.jpg"}
               title={milestone.title || "Untitled Milestone"}
               tags={milestone.tags || []}
