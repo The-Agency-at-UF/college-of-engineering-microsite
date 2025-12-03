@@ -1,6 +1,33 @@
+interface ExcellenceSectionProps {
+  selectedDepartment: string | null;
+  onDepartmentChange: (department: string | null) => void;
+}
 
+export default function ExcellenceSection({ selectedDepartment, onDepartmentChange }: ExcellenceSectionProps) {
+    const departments = [
+        { id: "all", name: "ALL", dataValue: null },
+        { id: "cise", name: "CISE", dataValue: "CISE" },
+        { id: "agbio", name: "AG BIO", dataValue: "ABE" }, // Maps to ABE in data
+        { id: "bme", name: "BME", dataValue: "BME" },
+        { id: "chem", name: "CHEM", dataValue: "CHEM" },
+        { id: "civil", name: "CIVIL", dataValue: "CIVIL" },
+        { id: "ese", name: "ESE", dataValue: "ESE" },
+        { id: "ise", name: "ISE", dataValue: "ISE" }, // Added back missing ISE
+        { id: "mae", name: "MAE", dataValue: "MAE" },
+        { id: "mse", name: "MSE", dataValue: "MSE" },
+        { id: "eee", name: "EEE", dataValue: "EEE" }
+    ];
 
-export default function ExcellenceSection() {
+    const handleDepartmentClick = (dept: typeof departments[0]) => {
+        onDepartmentChange(dept.dataValue);
+    };
+
+    const getSelectedDeptDisplay = () => {
+        if (!selectedDepartment) return null;
+        const dept = departments.find(d => d.dataValue === selectedDepartment);
+        return dept?.name || selectedDepartment;
+    };
+
     return( 
         <section className = "flex flex-col items-center justify-center gap-8 pt-[clamp(15px,3vw,50px)]">
             {/* Blue Banner area */}
@@ -8,43 +35,24 @@ export default function ExcellenceSection() {
                 Defining Excellence Since XXXX
             </div>
 
-        {/* Department buttons */}
+            {/* Department buttons - Now functional with correct mapping */}
             <div className="flex flex-wrap justify-center ml-[-5vw] gap-3 text-white font-bold w-[min(85%,1200px)] gap-y-2">
-                
-
-                <button className="bg-[#FA4616] text-[clamp(6px,2vw,16px)] px-[clamp(10px,4vw,80px)] py-[clamp(2px,0.5vw,12px)] rounded-full">
-                CISE
-                </button>
-
-                <button className="bg-[#002657] text-[clamp(6px,2vw,16px)] px-[clamp(10px,4vw,80px)] py-[clamp(2px,0.5vw,12px)] rounded-full">
-                DEPT
-                </button>
-
-                <button className="bg-[#002657] text-[clamp(6px,2vw,16px)] px-[clamp(10px,4vw,80px)] py-[clamp(2px,0.5vw,12px)] rounded-full">
-                DEPT
-                </button>
-
-                <button className="bg-[#FA4616] text-[clamp(6px,2vw,16px)] px-[clamp(10px,4vw,80px)] py-[clamp(2px,0.5vw,12px)] rounded-full">
-                AG BIO
-                </button>
-
-                <button className="bg-[#002657] text-[clamp(6px,2vw,16px)] px-[clamp(10px,4vw,80px)] py-[clamp(2px,0.5vw,12px)] rounded-full">
-                DEPT
-                </button>
-
-                <button className="bg-[#002657] text-[clamp(6px,2vw,16px)] px-[clamp(10px,4vw,80px)] py-[clamp(2px,0.5vw,12px)] rounded-full">
-                DEPT
-                </button>
-
-                <button className="bg-[#002657] text-[clamp(6px,2vw,16px)] px-[clamp(10px,4vw,80px)] py-[clamp(2px,0.5vw,12px)] rounded-full">
-                DEPT
-                </button>
-
+                {departments.map((dept) => (
+                    <button 
+                        key={dept.id}
+                        onClick={() => handleDepartmentClick(dept)}
+                        className={`text-[clamp(6px,2vw,16px)] px-[clamp(10px,4vw,80px)] py-[clamp(2px,0.5vw,12px)] rounded-full transition-colors ${
+                            selectedDepartment === dept.dataValue
+                                ? "bg-[#FA4616]" 
+                                : "bg-[#002657] hover:bg-[#FA4616]"
+                        }`}
+                    >
+                        {dept.name}
+                    </button>
+                ))}
             </div>
 
-            <div className="flex text-black py-5 text-lg" >
-                rest of content here...
-            </div>
+           
 
         </section> 
     );
