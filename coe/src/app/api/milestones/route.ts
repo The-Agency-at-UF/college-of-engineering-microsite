@@ -1,12 +1,58 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fakeMilestones } from "../../lib/fakeApiData";
+import { docClient } from "../../lib/dynamoClient";
+import { ScanCommand } from "@aws-sdk/lib-dynamodb";
 
-// Fake API that behaves exactly like AWS backend
+const TABLE_NAME = "legacy_milestones";
+
+// Fetch milestones from AWS DynamoDB
+async function fetchAWSMilestones() {
+  try {
+    if (!process.env.AWS_ACCESS_KEY_ID) {
+      // AWS credentials not configured, skip AWS fetch
+      return [];
+    }
+
+    const command = new ScanCommand({
+      TableName: TABLE_NAME,
+    });
+
+    const response = await docClient.send(command);
+    return response.Items || [];
+  } catch (error) {
+    console.warn("Failed to fetch milestones from AWS (will use fake data):", error);
+    return [];
+  }
+}
+
+// Merge AWS and fake data, with AWS data taking precedence
+function mergeMilestoneData(awsMilestones: any[], fakeMilestones: any[]) {
+  // Create a map of AWS milestones by ID for quick lookup
+  const awsMap = new Map(awsMilestones.map(m => [m.milestone_id, m]));
+  
+  // Start with fake milestones, but replace with AWS data if exists
+  const merged: any[] = [];
+  
+  // Add AWS milestones first (they take precedence)
+  for (const awsMilestone of awsMilestones) {
+    merged.push({
+      ...awsMilestone,
+      // Ensure AWS milestones keep their existing image_url if they have one
+    });
+  }
+  
+  // Add fake milestones that don't exist in AWS
+  for (const fakeMilestone of fakeMilestones) {
+    if (!awsMap.has(fakeMilestone.milestone_id)) {
+      merged.push(fakeMilestone);
+    }
+  }
+  
+  return merged;
+}
+
 export async function GET(request: NextRequest) {
   try {
-    // Simulate network delay like real API
-    await new Promise(resolve => setTimeout(resolve, 250));
-
     const { searchParams } = new URL(request.url);
     
     // Support query parameters for filtering/searching
@@ -16,18 +62,20 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    let filteredMilestones = [...fakeMilestones];
+    // Fetch from AWS first, then merge with fake data
+    const awsMilestones = await fetchAWSMilestones();
+    let allMilestones = mergeMilestoneData(awsMilestones, fakeMilestones);
 
     // Filter by department if specified
     if (department && department !== 'ALL') {
-      filteredMilestones = filteredMilestones.filter(milestone => 
-        milestone.department.toUpperCase() === department.toUpperCase()
+      allMilestones = allMilestones.filter(milestone => 
+        milestone.department?.toUpperCase() === department.toUpperCase()
       );
     }
 
     // Filter by significance level if specified
     if (significance) {
-      filteredMilestones = filteredMilestones.filter(milestone =>
+      allMilestones = allMilestones.filter(milestone =>
         milestone.significance_level === significance
       );
     }
@@ -35,36 +83,42 @@ export async function GET(request: NextRequest) {
     // Search in title and description if specified
     if (search) {
       const searchTerm = search.toLowerCase();
-      filteredMilestones = filteredMilestones.filter(milestone =>
-        milestone.title.toLowerCase().includes(searchTerm) ||
-        milestone.description.toLowerCase().includes(searchTerm) ||
-        milestone.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+      allMilestones = allMilestones.filter(milestone =>
+        milestone.title?.toLowerCase().includes(searchTerm) ||
+        milestone.description?.toLowerCase().includes(searchTerm) ||
+        milestone.tags?.some((tag: string) => tag.toLowerCase().includes(searchTerm))
       );
     }
 
     // Sort by date (newest first)
-    filteredMilestones.sort((a, b) => 
-      new Date(b.milestone_date).getTime() - new Date(a.milestone_date).getTime()
-    );
+    allMilestones.sort((a, b) => {
+      const dateA = new Date(a.milestone_date || 0).getTime();
+      const dateB = new Date(b.milestone_date || 0).getTime();
+      return dateB - dateA;
+    });
 
     // Apply pagination
-    const paginatedMilestones = filteredMilestones.slice(offset, offset + limit);
+    const paginatedMilestones = allMilestones.slice(offset, offset + limit);
 
     // Return AWS-style response
     return NextResponse.json({
       milestones: paginatedMilestones,
-      total: filteredMilestones.length,
+      total: allMilestones.length,
       offset: offset,
       limit: limit,
-      hasMore: offset + limit < filteredMilestones.length
+      hasMore: offset + limit < allMilestones.length
     });
 
   } catch (error) {
     console.error("Milestones API Error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch milestones", milestones: [] },
-      { status: 500 }
-    );
+    // Fallback to fake data only on error
+    return NextResponse.json({
+      milestones: fakeMilestones,
+      total: fakeMilestones.length,
+      offset: 0,
+      limit: fakeMilestones.length,
+      hasMore: false
+    });
   }
 }
 

@@ -17,7 +17,7 @@ export default function NavBar() {
         {/*Left NavBar side: Logo */}
         <div className="flex items-center">
           <Image
-            src="/images/legacy-logo.svg"
+            src="/images/LEGACY_CoE.svg"
             alt="Legacy 115th Logo"
             width={175}
             height={78}

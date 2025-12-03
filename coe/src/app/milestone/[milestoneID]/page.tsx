@@ -54,9 +54,11 @@ export default function MilestoneDetailPage() {
     const fetchMilestones = async () => {
       try {
         const res = await fetch("/api/milestones");
-        const data: Milestone[] = await res.json();
-        setAllMilestones(data || []);
-        const found = data.find((m) => m.milestone_id === milestoneID) || null;
+        const response = await res.json();
+        // API returns { milestones: [...], total, offset, limit, hasMore }
+        const milestones: Milestone[] = response.milestones || response || [];
+        setAllMilestones(milestones);
+        const found = milestones.find((m) => m.milestone_id === milestoneID) || null;
         setCurrent(found);
       } catch (err) {
         console.error("Failed to load milestones", err);
@@ -133,11 +135,22 @@ export default function MilestoneDetailPage() {
           <button onClick={() => router.back()} className="inline-flex items-center 
             justify-center mb-6 cursor-pointer -ml-2 sm:-ml-3" 
             aria-label="Go back">
-            <Image src="/images/Back.svg" 
-            alt="Back" 
-            width={44.22} 
-            height={44.22} 
-            className="w-[clamp(15px,2vw,45px)] h-auto" />
+            <svg
+              width="45"
+              height="45"
+              viewBox="0 0 45 45"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-[clamp(15px,2vw,45px)] h-auto text-white"
+            >
+              <path
+                d="M27.5 12.5L17.5 22.5L27.5 32.5"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </button>
 
           {/* Page Title Area */}
@@ -205,14 +218,12 @@ export default function MilestoneDetailPage() {
             {/* RIGHT column: image */}
             <div className="relative w-full max-w-[clamp(220px,70vw,420px)] 
               aspect-[4/3] mx-auto md:mx-0 overflow-hidden bg-[#D1D5DB]">
-              {current.image_url && (
-                <Image
-                  src={current.image_url}
-                  alt={current.title}
-                  fill
-                  className="object-cover"
-                />
-              )}
+              <Image
+                src={current.image_url || "/images/pic1.jpg"}
+                alt={current.title}
+                fill
+                className="object-cover"
+              />
             </div>
           </div>
         </div> 

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import MilestoneGridComponent from "../components/MilestoneGridComponent";
@@ -18,6 +17,14 @@ export default function MilestonePage() {
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [departmentImages, setDepartmentImages] = useState<string[]>([]);
+
+  // Fetch department images - must be called before any conditional returns
+  useEffect(() => {
+    fetch("/api/departments")
+      .then((res) => res.json())
+      .then((data: string[]) => setDepartmentImages(data))
+      .catch(() => setDepartmentImages([]));
+  }, []);
 
   const handleFilterChange = (filterId: string, selectedValues: string[]) => {
     setFilterState(prev => ({
@@ -82,21 +89,25 @@ export default function MilestonePage() {
     );
   }
 
-  // Fetch department images
-  useEffect(() => {
-    fetch("/api/departments")
-      .then((res) => res.json())
-      .then((data: string[]) => setDepartmentImages(data))
-      .catch(() => setDepartmentImages([]));
-  }, []);
-
-  // Match department names to images
-  const getDeptImage = (dept: string) => {
-  return departmentImages.find((img) =>
-    img.toLowerCase().replace(/\s/g, "") // remove spaces
-       .includes(dept.toLowerCase().replace(/\s/g, ""))
-  ) || null;
-};
+  // Match department names to images, with placeholder fallback
+  const getDeptImage = (dept: string, index: number) => {
+    // First try to find the actual department image
+    const deptImage = departmentImages.find((img) => {
+      // Extract filename from path and normalize
+      const filename = img.split('/').pop()?.toLowerCase().replace(/\s/g, "").replace(/\.(jpg|jpeg|png|gif)$/i, "") || "";
+      const deptNormalized = dept.toLowerCase().replace(/\s/g, "");
+      return filename.includes(deptNormalized) || deptNormalized.includes(filename);
+    });
+    
+    // If found, return it; otherwise use a placeholder
+    if (deptImage) {
+      return deptImage;
+    }
+    
+    // Use placeholder images (pic1-pic7) cycling through them
+    const placeholderIndex = (index % 7) + 1;
+    return `/images/pic${placeholderIndex}.jpg`;
+  };
 
 
 
@@ -172,19 +183,40 @@ export default function MilestonePage() {
             }
           }}
         >
-          {["AG BIO", "BME", "CHEM", "CISE", "CIVIL", "EEE", "ESE", "ISE", "MAE", "MSE", "PHY", "ABE"].map((dept, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleDepartmentClick(dept)}
-              className={`flex-shrink-0 w-80 h-50 text-white text-6xl italic flex items-center justify-center rounded-xl transition ${
-                selectedDepartment === dept
-                  ? 'bg-[#FA4616] shadow-lg' 
-                  : 'bg-[#002657B2] bg-opacity-70 hover:bg-[#002657] cursor-pointer'
-              }`}
-            >
-              {dept}
-            </button>
-          ))}
+          {["AG BIO", "BME", "CHEM", "CISE", "CIVIL", "EEE", "ESE", "ISE", "MAE", "MSE", "PHY", "ABE"].map((dept, idx) => {
+            const imagePath = getDeptImage(dept, idx);
+            return (
+              <button
+                key={idx}
+                onClick={() => handleDepartmentClick(dept)}
+                className={`relative flex-shrink-0 w-80 h-50 rounded-xl cursor-pointer overflow-hidden transition ${
+                  selectedDepartment === dept
+                    ? 'ring-4 ring-[#FA4616] shadow-lg' 
+                    : 'hover:ring-2 hover:ring-[#002657]'
+                }`}
+              >
+                {/* Image */}
+                <Image
+                  src={imagePath}
+                  alt={dept}
+                  fill
+                  className="object-cover z-0"
+                  sizes="(max-width: 768px) 100vw, 20vw"
+                  onError={(e) => (e.target as HTMLImageElement).style.display = "none"}
+                />
+                {/* Overlay */}
+                <div className={`absolute inset-0 z-10 ${
+                  selectedDepartment === dept
+                    ? 'bg-[rgba(250,70,22,0.7)]' 
+                    : 'bg-[rgba(0,38,87,0.7)]'
+                }`} />
+                {/* Text */}
+                <span className="absolute inset-0 z-20 flex items-center justify-center text-white text-6xl italic">
+                  {dept}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
@@ -218,9 +250,11 @@ export default function MilestonePage() {
                 filteredMilestones.map((milestone) => (
                   <MilestoneCard
                     key={milestone.milestone_id}
+                    id={milestone.milestone_id}
                     imageSrc={milestone.image_url || "/images/pic1.jpg"}
                     title={milestone.title}
                     tags={milestone.themes || []}
+                    description={milestone.description}
                   />
                 ))
               ) : (

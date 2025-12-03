@@ -173,6 +173,7 @@ export const fakeMilestones: Milestone[] = [
     tags: ["historic", "infrastructure", "foundation"],
     themes: ["infrastructure", "education"],
     media_format: "image",
+    image_url: "/images/gallery/'74 Gainesville Sun Publicity.JPG",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   },
@@ -185,6 +186,7 @@ export const fakeMilestones: Milestone[] = [
     tags: ["computer-science", "department-founding", "education"],
     themes: ["technology", "education", "innovation"],
     media_format: "document",
+    image_url: "/images/gallery/'74 Orlando Exhibit 2.JPG",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   },
@@ -197,6 +199,7 @@ export const fakeMilestones: Milestone[] = [
     tags: ["biomedical", "interdisciplinary", "healthcare"],
     themes: ["healthcare", "education", "innovation"],
     media_format: "video",
+    image_url: "/images/gallery/'75 AIME Honorees INF.JPG",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   },
@@ -209,6 +212,7 @@ export const fakeMilestones: Milestone[] = [
     tags: ["pilot-plant", "laboratory", "industrial-processes"],
     themes: ["infrastructure", "research", "innovation"],
     media_format: "image",
+    image_url: "/images/gallery/'75 Civil Student Project INF.JPG",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   },
@@ -221,6 +225,7 @@ export const fakeMilestones: Milestone[] = [
     tags: ["research-institute", "materials", "nanotechnology"],
     themes: ["materials", "research", "technology"],
     media_format: "presentation",
+    image_url: "/images/gallery/'75 Honor Student INF.JPG",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   },
@@ -233,6 +238,7 @@ export const fakeMilestones: Milestone[] = [
     tags: ["precision-agriculture", "gps", "sensors", "data-analytics"],
     themes: ["sustainability", "technology", "innovation"],
     media_format: "interactive",
+    image_url: "/images/gallery/'74 High School Students in Summer INF.JPG",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   },
@@ -245,6 +251,7 @@ export const fakeMilestones: Milestone[] = [
     tags: ["aerospace", "wind-tunnels", "propulsion", "simulation"],
     themes: ["aerospace", "research", "infrastructure"],
     media_format: "video",
+    image_url: "/images/gallery/'74 Student Glider INF.JPG",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   },
@@ -257,6 +264,7 @@ export const fakeMilestones: Milestone[] = [
     tags: ["environmental", "water-resources", "air-quality", "sustainability"],
     themes: ["sustainability", "research", "infrastructure"],
     media_format: "document",
+    image_url: "/images/gallery/'75 Bike INF.JPG",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z"
   }

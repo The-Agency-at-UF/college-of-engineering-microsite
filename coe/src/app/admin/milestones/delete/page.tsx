@@ -17,7 +17,7 @@ export default function DeleteMilestonePage() {
   useEffect(() => {
     fetch("/api/milestones")
       .then((r) => r.json())
-      .then((data) => setMilestones(data));
+      .then((data) => setMilestones(data.milestones || []));
   }, []);
 
   async function deleteMilestone() {
@@ -45,7 +45,7 @@ export default function DeleteMilestonePage() {
   return (
     <div>
 
-      <h2 className="text-2xl font-bold mb-6">Delete Milestone</h2>
+      <h2 className="text-2xl text-[#002657] font-bold mb-4">Delete Milestone</h2>
 
       <select
         value={selected}

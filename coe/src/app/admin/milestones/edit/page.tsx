@@ -20,7 +20,7 @@ export default function EditMilestonePage() {
   useEffect(() => {
     fetch("/api/milestones")
       .then((r) => r.json())
-      .then((data) => setMilestones(data));
+      .then((data) => setMilestones(data.milestones || []));
   }, []);
 
   // Load selected milestone
@@ -82,14 +82,14 @@ export default function EditMilestonePage() {
   }
 
   return (
-    <div className="pb-10">
+    <div>
 
-      <h2 className="text-2xl font-bold mb-6">Edit Milestone</h2>
+      <h2 className="text-2xl text-[#002657] font-bold mb-4">Edit Milestone</h2>
 
       <select
         value={selected}
         onChange={(e) => setSelected(e.target.value)}
-        className="border p-2 rounded w-full mb-6"
+        className="border p-2 rounded w-full mb-6 text-[#002657]"
       >
         <option value="">Select a milestone</option>
 
@@ -105,16 +105,18 @@ export default function EditMilestonePage() {
         <div className="space-y-4">
           <input
             name="title"
+            placeholder="Title"
             value={form.title || ""}
             onChange={update}
-            className="border p-2 w-full"
+            className="border p-2 w-full text-[#002657] placeholder:text-[#002657]"
           />
 
           <input
             name="department"
+            placeholder="Department"
             value={form.department || ""}
             onChange={update}
-            className="border p-2 w-full"
+            className="border p-2 w-full text-[#002657] placeholder:text-[#002657]"
           />
 
           <input
@@ -122,28 +124,30 @@ export default function EditMilestonePage() {
             name="milestone_date"
             value={form.milestone_date?.slice(0, 10) || ""}
             onChange={update}
-            className="border p-2 w-full"
+            className="border p-2 w-full text-[#002657] placeholder:text-[#002657]"
           />
 
           <textarea
             name="description"
+            placeholder="Description"
             value={form.description || ""}
             onChange={update}
-            className="border p-2 w-full"
+            className="border p-2 w-full text-[#002657] placeholder:text-[#002657]"
           />
 
           <input
             name="tags"
+            placeholder="Tags (comma separated)"
             value={form.tags || ""}
             onChange={update}
-            className="border p-2 w-full"
+            className="border p-2 w-full text-[#002657] placeholder:text-[#002657]"
           />
 
           <select
             name="media_type"
             value={form.media_type || "image"}
             onChange={update}
-            className="border p-2 w-full"
+            className="border p-2 w-full text-[#002657]"
           >
             <option value="image">Image</option>
             <option value="video">Video</option>
@@ -159,23 +163,28 @@ export default function EditMilestonePage() {
             />
           )}
 
-          {/* Upload replacement */}
-          <input
-            type="file"
-            onChange={(e) => setNewImage(e.target.files?.[0] ?? null)}
-          />
+          {/* Styled Upload Button + File Name */}
+          <div className="flex flex-col">
+            <label className="bg-[#0021A5] text-white px-4 py-2 rounded cursor-pointer w-fit hover:bg-[#001d42] transition">
+              Choose File
+              <input
+                type="file"
+                className="hidden"
+                onChange={(e) => setNewImage(e.target.files?.[0] ?? null)}
+              />
+            </label>
 
-          {newImage && (
-            <p className="text-sm text-green-700 mt-1">
-              Selected new file:{" "}
-              <span className="font-semibold">{newImage.name}</span>
-            </p>
-          )}
+            {newImage && (
+              <p className="text-sm text-green-700 mt-2">
+                Selected file: <span className="font-semibold">{newImage.name}</span>
+              </p>
+            )}
+          </div>
 
           <button
             onClick={saveChanges}
             disabled={loading}
-            className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
           >
             {loading ? "Saving..." : "Save Changes"}
           </button>
