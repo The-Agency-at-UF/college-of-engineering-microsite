@@ -4,6 +4,7 @@ const nextConfig = {
   images: {
     domains: [
       "coe-milestones-bucket.s3.us-east-1.amazonaws.com", // your S3 bucket
+      "coe-carousel-bucket.s3.us-east-1.amazonaws.com", // your S3 bucket
     ],
   },
   eslint: {
