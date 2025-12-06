@@ -8,7 +8,7 @@ export default function PhotoGallery() {
 
   // Fetch images from API route
   useEffect(() => {
-    fetch("/api/gallery")
+    fetch("/api/carousel")
       .then((res) => res.json())
       .then((data) => {
         setImages(data);
