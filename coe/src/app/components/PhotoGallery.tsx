@@ -8,12 +8,24 @@ export default function PhotoGallery() {
 
   // Fetch images from API route
   useEffect(() => {
-    fetch("/api/gallery")
-      .then((res) => res.json())
-      .then((data) => {
-        setImages(data);
+    (async () => {
+      try {
+        const res = await fetch("/api/carousel");
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+          setImages(data);
+        } else {
+          console.error("/api/carousel returned non-array:", data);
+          setImages([]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch carousel images:", err);
+        setImages([]);
+      } finally {
         setLoaded(true);
-      });
+      }
+    })();
   }, []);
 
   if (!loaded) return null;
