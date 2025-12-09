@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Milestone, mockMilestones, Event, mockEvents } from "./mockData";
+import { Milestone, Event } from "./fakeApiData";
 import { ApiClient } from "./apiClient";
 
 export interface UseMilestonesReturn {
