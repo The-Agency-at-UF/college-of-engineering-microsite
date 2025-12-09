@@ -5,18 +5,34 @@ export default function TimelineHeader() {
   return (
     <>
       {/* Title Section */}
-      <section className="grid grid-cols-[1.7fr_1fr] h-[clamp(300px,70vh,1000px)] bg-[#002657]">
+      <section 
+        className="grid grid-cols-[1.7fr_1fr] h-[clamp(300px,70vh,1000px)] relative"
+        style={{
+          backgroundImage: 'url(/images/Landing_Bg.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: '#002657'
+        }}
+      >
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-[#002657] opacity-70"></div>
+        
         {/* Left side - title */}
-        <div className="bg-[#002657] text-white flex items-center pl-[clamp(50px,12vw,220px)] py-10">
+        <div className="relative z-10 text-white flex items-center pl-[clamp(50px,12vw,220px)] py-10">
           <div>
-            <h1 className="text-[clamp(50px,5vw,78px)] font-bold">
-              LEGACY
-            </h1>
-            <h2 className="text-[clamp(70px,8vw,115px)] font-bold -mt-6">
-              115
-            </h2>
-            <h3 className="text-[clamp(10px,1.7vw,30px)] font-bold leading-[1]">
-              ENGINEERING OUR LEGACY,<br />BUILDING THE FUTURE
+            <div className="mb-2">
+              <Image
+                src="/images/LEGACY_CoE.svg"
+                alt="Legacy"
+                width={400}
+                height={178}
+                priority
+                className="w-[clamp(200px,25vw,400px)] h-auto"
+              />
+            </div>
+            <h3 className="text-[clamp(10px,1.7vw,30px)] text-orange-400 font-bold italic leading-[1]">
+              ENGINEERING THE FUTURE 
             </h3>
           </div>
         </div>
