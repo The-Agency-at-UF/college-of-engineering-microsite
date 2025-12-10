@@ -23,12 +23,12 @@ async function getAllData() {
     }
   }
 
-  const events = await safeFetch(`${base}/api/events`);
-  const milestones = await safeFetch(`${base}/api/milestones`);
+  const eventsResponse = await safeFetch(`${base}/api/events`);
+  const milestonesResponse = await safeFetch(`${base}/api/milestones`);
 
   return {
-    events: Array.isArray(events) ? events : [],
-    milestones: Array.isArray(milestones) ? milestones : [],
+    events: Array.isArray(eventsResponse?.events) ? eventsResponse.events : (Array.isArray(eventsResponse) ? eventsResponse : []),
+    milestones: Array.isArray(milestonesResponse?.milestones) ? milestonesResponse.milestones : (Array.isArray(milestonesResponse) ? milestonesResponse : []),
   };
 }
 

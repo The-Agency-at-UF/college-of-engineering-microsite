@@ -3,7 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig = {
   images: {
     domains: [
-      "coe-milestones-bucket.s3.us-east-1.amazonaws.com", // your S3 bucket
+      "coe-milestones-bucket.s3.us-east-1.amazonaws.com", // milestones S3 bucket
+      "coe-events-bucket.s3.amazonaws.com", // events S3 bucket
+      "coe-events-bucket.s3.us-east-1.amazonaws.com", // events S3 bucket (region-specific)
     ],
   },
   eslint: {

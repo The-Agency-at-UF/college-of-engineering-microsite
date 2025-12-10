@@ -1,10 +1,12 @@
 import React from "react";
+import Image from "next/image";
 
 export interface EventCardProps {
   title?: string;
   dateRange?: string;
   description?: string;
   sourceLabel?: string;
+  imageUrl?: string;
 }
 
 const EventCardComponent: React.FC<EventCardProps> = ({
@@ -12,7 +14,11 @@ const EventCardComponent: React.FC<EventCardProps> = ({
   dateRange = "XXXX–XXXX",
   description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.",
   sourceLabel = "MORE FROM XXXX",
+  imageUrl,
 }) => {
+  // Use placeholder image if no imageUrl is provided
+  const imageSrc = imageUrl || "/images/pic1.jpg";
+
   return (
     <div className="relative w-[320px] flex flex-col items-center font-['IBM Plex Sans']">
       {/* Top label with text arrows */}
@@ -21,7 +27,14 @@ const EventCardComponent: React.FC<EventCardProps> = ({
       </p>
 
       {/* Image box */}
-      <div className="w-[280px] h-[190px] border-2 border-[#0021A5] bg-gray-300 z-20 relative"></div>
+      <div className="w-[280px] h-[190px] border-2 border-[#0021A5] bg-gray-300 z-20 relative overflow-hidden">
+        <Image
+          src={imageSrc}
+          alt={title || "Event image"}
+          fill
+          className="object-cover"
+        />
+      </div>
 
       {/* Rounded rectangle content box*/}
       <div className="w-full bg-white border-2 border-[#0021A5] rounded-[20px] -mt-30 pt-[130px] pb-[16px] px-4 shadow-lg hover:shadow-2xl transition-all duration-200">
@@ -49,26 +62,6 @@ const EventCardComponent: React.FC<EventCardProps> = ({
         </p>
 
         {/* Learn More with arrow */}
-        <div className="flex justify-end items-center mt-[4px]">
-          <a
-            href="#"
-            className="text-[#002657] text-[11px] font-semibold flex items-center gap-[3px] hover:underline transition-all"
-          >
-            LEARN MORE
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 8 8"
-              fill="none"
-              stroke="#002657"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-[8px] h-[8px]"
-            >
-              <path d="M1 1l3 3-3 3" />
-            </svg>
-          </a>
-        </div>
       </div>
     </div>
   );

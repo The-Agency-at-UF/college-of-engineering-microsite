@@ -10,9 +10,14 @@ import EventGridComponent from "../components/EventGridComponent";
 
 export default function Home() {
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [visibleEventDates, setVisibleEventDates] = useState<string[]>([]);
+  const itemsPerPage = 9;
 
   const handleDepartmentChange = (department: string | null) => {
     setSelectedDepartment(department);
+    setCurrentPage(1); // Reset to first page when department changes
   };
 
   return (
@@ -33,8 +38,15 @@ export default function Home() {
       {/* ======= TIMELINE BAR + EVENT GRID ======= */}
       <section className="bg-white">
         <div className="flex">
-          {/* <Timeline /> */}
-          <EventGridComponent selectedDepartment={selectedDepartment} />
+          <Timeline visibleEventDates={visibleEventDates} />
+          <EventGridComponent 
+            selectedDepartment={selectedDepartment}
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+            onTotalItemsChange={setTotalItems}
+            onVisibleEventDatesChange={setVisibleEventDates}
+          />
         </div>
       </section>
 
