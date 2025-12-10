@@ -2,11 +2,33 @@ import type { NextConfig } from "next";
    
 const nextConfig = {
   images: {
-    domains: [
-      "coe-milestones-bucket.s3.us-east-1.amazonaws.com", // milestones S3 bucket
-      "coe-events-bucket.s3.amazonaws.com", // events S3 bucket
-      "coe-events-bucket.s3.us-east-1.amazonaws.com", // events S3 bucket (region-specific)
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.s3.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.s3.*.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'coe-milestones-bucket.s3.us-east-1.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'coe-events-bucket.s3.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'coe-events-bucket.s3.us-east-1.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'coe-carousel-bucket.s3.us-east-1.amazonaws.com',
+      },
     ],
+    unoptimized: false,
   },
   eslint: {
       // Warning: This allows production builds to successfully complete even if

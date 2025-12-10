@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { docClient } from "@/app/lib/dynamoClient";
 import { GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 
-const TABLE_NAME = process.env.DYNAMO_TABLE_NAME_M!;
+const TABLE_NAME = process.env.DYNAMO_TABLE_NAME_M || "legacy_milestones";
 
 // GET one milestone
 export async function GET(

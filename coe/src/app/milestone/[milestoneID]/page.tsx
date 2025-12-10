@@ -29,6 +29,7 @@ interface Milestone {
   milestone_date?: string;
   image_url?: string;
   tags?: string[];
+  media_type?: string;
 }
 
 //Helper function to get a year from the date string
@@ -215,15 +216,29 @@ export default function MilestoneDetailPage() {
                 bg-gradient-to-r from-[#F2A900] to-[#774219] -ml-[11vw]" />
             </div>
 
-            {/* RIGHT column: image */}
+            {/* RIGHT column: media (image or video) */}
             <div className="relative w-full max-w-[clamp(220px,70vw,420px)] 
               aspect-[4/3] mx-auto md:mx-0 overflow-hidden bg-[#D1D5DB]">
-              <Image
-                src={current.image_url || "/images/pic1.jpg"}
-                alt={current.title}
-                fill
-                className="object-cover"
-              />
+              {current.media_type === "video" ? (
+                <video
+                  src={current.image_url || ""}
+                  controls
+                  className="w-full h-full object-cover"
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                  onError={(e) => {
+                    console.error("Video failed to load:", current.image_url);
+                  }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <Image
+                  src={current.image_url || "/images/pic1.jpg"}
+                  alt={current.title}
+                  fill
+                  className="object-cover"
+                />
+              )}
             </div>
           </div>
         </div> 

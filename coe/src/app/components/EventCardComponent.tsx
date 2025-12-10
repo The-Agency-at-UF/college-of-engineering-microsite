@@ -16,8 +16,23 @@ const EventCardComponent: React.FC<EventCardProps> = ({
   sourceLabel = "MORE FROM XXXX",
   imageUrl,
 }) => {
+  // Generate a deterministic random image based on title when no imageUrl is provided
+  // This ensures the same event always gets the same random image
+  const getRandomPlaceholderImage = (seed: string): string => {
+    // Simple hash function to convert string to number
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+      const char = seed.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    // Map hash to 1-7 range for pic1.jpg through pic7.jpg
+    const picNumber = (Math.abs(hash) % 7) + 1;
+    return `/images/pic${picNumber}.jpg`;
+  };
+
   // Use placeholder image if no imageUrl is provided
-  const imageSrc = imageUrl || "/images/pic1.jpg";
+  const imageSrc = imageUrl || getRandomPlaceholderImage(title);
 
   return (
     <div className="relative w-[320px] flex flex-col items-center font-['IBM Plex Sans']">

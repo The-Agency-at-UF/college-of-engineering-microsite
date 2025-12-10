@@ -27,12 +27,26 @@ export async function POST(req: Request) {
     const key = `${kind}/uploads/${Date.now()}-${file.name}`;
     const arrayBuffer = await file.arrayBuffer();
 
+    // Determine ContentType - ensure videos get proper MIME type
+    let contentType = file.type || "application/octet-stream";
+    if (!contentType || contentType === "application/octet-stream") {
+      // Fallback: guess from file extension
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      if (ext === 'mp4') contentType = 'video/mp4';
+      else if (ext === 'webm') contentType = 'video/webm';
+      else if (ext === 'mov') contentType = 'video/quicktime';
+      else if (ext === 'avi') contentType = 'video/x-msvideo';
+    }
+
+    // Note: ACL is not set because bucket uses "Bucket owner enforced" setting
+    // Public access must be controlled via bucket policy instead
     await s3.send(
       new PutObjectCommand({
         Bucket: bucket,
         Key: key,
         Body: Buffer.from(arrayBuffer),
-        ContentType: file.type || "application/octet-stream",
+        ContentType: contentType,
+        CacheControl: 'max-age=31536000', // Cache for 1 year
       })
     );
 

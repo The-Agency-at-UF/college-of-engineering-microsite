@@ -9,6 +9,7 @@ interface MilestoneCardProps {
   title: string;
   tags: string[];
   description?: string;
+  media_type?: string;
 }
 
 //truncate function to shorten description text
@@ -18,7 +19,9 @@ function truncate(text: string | undefined, maxLength = 150) {
   return text.slice(0, maxLength).trim() + "…";
 }
 
-export default function MilestoneCard({ id, imageSrc, title, tags, description }: MilestoneCardProps) {
+export default function MilestoneCard({ id, imageSrc, title, tags, description, media_type = "image" }: MilestoneCardProps) {
+  const isVideo = media_type === "video";
+  
   return (
     <Link href={`/milestone/${id}`} className="group block">
       <div
@@ -31,14 +34,28 @@ export default function MilestoneCard({ id, imageSrc, title, tags, description }
           overflow-hidden
         "
       > {/* Card Container with outline border and shadow */}
-        <div className="w-full h-full flex flex-col"> {/* Image */}
-          <div className="relative flex-[3] bg-neutral-100">
-            <Image
-              src={imageSrc}
-              alt={title}
-              fill
-              className="object-cover"
-            />
+        <div className="w-full h-full flex flex-col"> {/* Media (Image or Video) */}
+          <div className="relative flex-[3] bg-neutral-100 overflow-hidden">
+            {isVideo ? (
+              <video
+                src={imageSrc}
+                className="w-full h-full object-cover"
+                muted
+                playsInline
+                preload="metadata"
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                onError={(e) => {
+                  console.error("Video failed to load:", imageSrc);
+                }}
+              />
+            ) : (
+              <Image
+                src={imageSrc}
+                alt={title}
+                fill
+                className="object-cover"
+              />
+            )}
           </div>
 
           <div className="h-[3px] bg-[#0021A5] group-hover:bg-[#FA4616] transition-colors" /> {/* Divider */}

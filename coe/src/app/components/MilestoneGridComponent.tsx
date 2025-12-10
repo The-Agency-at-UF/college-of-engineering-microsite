@@ -71,6 +71,7 @@ const MilestoneGridComponent = () => {
               imageSrc={milestone.image_url || "/images/pic1.jpg"}
               title={milestone.title || "Untitled Milestone"}
               tags={milestone.tags || []}
+              media_type={milestone.media_type || "image"}
             />
           ))
         ) : (

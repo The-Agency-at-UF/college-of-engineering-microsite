@@ -255,6 +255,7 @@ export default function MilestonePage() {
                     title={milestone.title}
                     tags={milestone.themes || []}
                     description={milestone.description}
+                    media_type={milestone.media_type || "image"}
                   />
                 ))
               ) : (
