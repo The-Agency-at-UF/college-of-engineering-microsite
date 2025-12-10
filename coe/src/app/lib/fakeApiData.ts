@@ -24,6 +24,7 @@ export interface Milestone {
   tags?: string[];
   themes?: string[];
   media_format?: string;
+  media_type?: string;
   created_at: string;
   updated_at: string;
 }

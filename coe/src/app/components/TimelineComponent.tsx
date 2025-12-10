@@ -19,18 +19,11 @@ export default function Timeline({ visibleEventDates }: TimelineProps) {
 
   const totalDecades = decades.length; // 12 decades
   const timelineHeight = 500; // Height of the main timeline
-  const decadeHeight = timelineHeight / totalDecades; // Height per decade
 
   // Extract year from date string
   const extractYear = (date: string): number | null => {
     const yearMatch = date.match(/^(\d{4})/);
     return yearMatch ? parseInt(yearMatch[1], 10) : null;
-  };
-
-  // Get decade index from year (2020s = 0, 2010s = 1, ..., 1910s = 11)
-  const getDecadeIndex = (year: number): number => {
-    const decadeStart = Math.floor(year / 10) * 10;
-    return (2020 - decadeStart) / 10;
   };
 
   // Calculate year range from currently rendered events
@@ -61,6 +54,12 @@ export default function Timeline({ visibleEventDates }: TimelineProps) {
       return null;
     }
 
+    // Get decade index from year (2020s = 0, 2010s = 1, ..., 1910s = 11)
+    const getDecadeIndex = (year: number): number => {
+      const decadeStart = Math.floor(year / 10) * 10;
+      return (2020 - decadeStart) / 10;
+    };
+
     // Round down to nearest decade (e.g., 2013 -> 2010s, 2023 -> 2020s)
     const earliestDecade = Math.floor(visibleYearRange.min / 10) * 10;
     const latestDecade = Math.floor(visibleYearRange.max / 10) * 10;
@@ -87,7 +86,7 @@ export default function Timeline({ visibleEventDates }: TimelineProps) {
       height,
       activeDecadeIndex: startDecade,
     };
-  }, [visibleYearRange, totalDecades, timelineHeight, getDecadeIndex]);
+  }, [visibleYearRange, totalDecades, timelineHeight]);
 
   return (
     <aside className="p-16 flex flex-col items-center z-50">

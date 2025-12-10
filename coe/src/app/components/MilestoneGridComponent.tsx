@@ -64,7 +64,7 @@ const MilestoneGridComponent = () => {
       <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 place-items-center pt-10">
         {/* Ensure allMilestones is an array before mapping */}
         {Array.isArray(allMilestones) && allMilestones.length > 0 ? (
-          allMilestones.map((milestone: any) => (
+          allMilestones.map((milestone: { milestone_id?: string; image_url?: string; title?: string; tags?: string[]; media_type?: string }) => (
             <MilestoneCard
               key={milestone.milestone_id || Math.random()}
               id={milestone.milestone_id || String(Math.random())}

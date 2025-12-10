@@ -61,7 +61,7 @@ export async function PATCH(
     const fields = Object.keys(filtered);
     const updateExpr = fields.map((f) => `${f} = :${f}`).join(", ");
 
-    const values: any = {};
+    const values: Record<string, unknown> = {};
     fields.forEach((f) => {
       values[`:${f}`] = filtered[f];
     });

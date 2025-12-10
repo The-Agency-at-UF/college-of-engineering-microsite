@@ -4,14 +4,16 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/admin/useToast";
 import { Toast } from "@/app/admin/Toast";
+import Image from "next/image";
+import { Milestone, MilestoneForm } from "@/app/lib/types";
 
 export default function EditMilestonePage() {
   const router = useRouter();
   const { message, showToast } = useToast();
 
-  const [milestones, setMilestones] = useState<any[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [selected, setSelected] = useState("");
-  const [form, setForm] = useState<any>(null);
+  const [form, setForm] = useState<MilestoneForm | null>(null);
 
   const [newFile, setNewFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -39,11 +41,13 @@ export default function EditMilestonePage() {
       });
   }, [selected]);
 
-  function update(e: any) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    // Clear file when media type changes
-    if (e.target.name === "media_type") {
-      setNewFile(null);
+  function update(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    if (form) {
+      setForm({ ...form, [e.target.name]: e.target.value });
+      // Clear file when media type changes
+      if (e.target.name === "media_type") {
+        setNewFile(null);
+      }
     }
   }
 
@@ -62,6 +66,8 @@ export default function EditMilestonePage() {
   };
 
   async function saveChanges() {
+    if (!form) return;
+    
     setLoading(true);
 
     let image_url = form.image_url;
@@ -77,15 +83,19 @@ export default function EditMilestonePage() {
       image_url = json.imageUrl;
     }
 
+    // Handle tags - convert string to array if needed
+    const tagsArray = typeof form.tags === "string"
+      ? form.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
+      : Array.isArray(form.tags)
+      ? form.tags
+      : [];
+
     const res = await fetch(`/api/milestones/edit/${selected}`, {
       method: "PATCH",
       body: JSON.stringify({
         ...form,
         image_url,
-        tags: form.tags
-          .split(",")
-          .map((t: string) => t.trim())
-          .filter(Boolean),
+        tags: tagsArray,
       }),
     });
 
@@ -181,10 +191,12 @@ export default function EditMilestonePage() {
                 className="w-40 rounded border"
               />
             ) : (
-              <img
+              <Image
                 src={form.image_url}
                 alt="milestone"
-                className="w-40 rounded border"
+                width={160}
+                height={160}
+                className="w-40 rounded border object-cover"
               />
             )
           )}
@@ -212,7 +224,7 @@ export default function EditMilestonePage() {
               <div className="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded p-3">
                 <p className="font-semibold text-yellow-800 mb-1">File Access Note:</p>
                 <p className="text-yellow-700">
-                  If files show "Access Denied", you need to add a bucket policy in AWS S3 console 
+                  If files show &quot;Access Denied&quot;, you need to add a bucket policy in AWS S3 console 
                   to make objects publicly readable. ACLs are disabled on this bucket.
                 </p>
               </div>

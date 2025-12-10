@@ -76,7 +76,7 @@ async function processEvents(dryRun: boolean = false, apiUrl: string = 'http://l
   console.log(`API URL: ${apiUrl}\n`);
   console.log('='.repeat(80));
 
-  const events = completeEvents.map((event, index) => {
+  const events = completeEvents.map((event) => {
     const eventDate = parseYearToDate(event.year);
     const department = mapDepartment(event.department);
 
@@ -121,7 +121,7 @@ async function processEvents(dryRun: boolean = false, apiUrl: string = 'http://l
       });
 
       if (response.ok) {
-        const result = await response.json();
+        await response.json();
         console.log(`✅ [${i + 1}/${events.length}] Created: ${event.title}`);
         successCount++;
       } else {

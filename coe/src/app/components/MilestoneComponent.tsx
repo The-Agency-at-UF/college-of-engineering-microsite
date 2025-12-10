@@ -44,7 +44,7 @@ export default function MilestoneCard({ id, imageSrc, title, tags, description, 
                 playsInline
                 preload="metadata"
                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                onError={(e) => {
+                onError={() => {
                   console.error("Video failed to load:", imageSrc);
                 }}
               />

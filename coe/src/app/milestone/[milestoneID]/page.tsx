@@ -32,19 +32,11 @@ interface Milestone {
   media_type?: string;
 }
 
-//Helper function to get a year from the date string
-function extractYear(dateStr?: string): string | undefined {
-  if (!dateStr) return undefined;
-  const match = dateStr.match(/\d{4}/);
-  return match ? match[0] : undefined;
-}
-
 export default function MilestoneDetailPage() {
   const { milestoneID } = useParams() as { milestoneID: string };
   const router = useRouter();
 
-  //Stores all milestones and the selected current milestone
-  const [allMilestones, setAllMilestones] = useState<Milestone[]>([]);
+  //Stores the selected current milestone
   const [current, setCurrent] = useState<Milestone | null>(null);
 
   //Loading state for when the page is loading (could change to a loading symbol later)
@@ -58,7 +50,6 @@ export default function MilestoneDetailPage() {
         const response = await res.json();
         // API returns { milestones: [...], total, offset, limit, hasMore }
         const milestones: Milestone[] = response.milestones || response || [];
-        setAllMilestones(milestones);
         const found = milestones.find((m) => m.milestone_id === milestoneID) || null;
         setCurrent(found);
       } catch (err) {
@@ -225,7 +216,7 @@ export default function MilestoneDetailPage() {
                   controls
                   className="w-full h-full object-cover"
                   style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                  onError={(e) => {
+                  onError={() => {
                     console.error("Video failed to load:", current.image_url);
                   }}
                 >

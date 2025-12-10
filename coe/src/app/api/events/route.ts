@@ -16,11 +16,14 @@ async function fetchAWSEvents() {
       return [];
     }
 
-    const allItems: any[] = [];
-    let lastEvaluatedKey: Record<string, any> | undefined = undefined;
+    const allItems: Record<string, unknown>[] = [];
+    let lastEvaluatedKey: Record<string, unknown> | undefined = undefined;
 
     do {
-      const scanParams: any = {
+      const scanParams: {
+        TableName: string;
+        ExclusiveStartKey?: Record<string, unknown>;
+      } = {
         TableName: TABLE_NAME,
       };
       
@@ -35,7 +38,7 @@ async function fetchAWSEvents() {
         allItems.push(...response.Items);
       }
 
-      lastEvaluatedKey = response.LastEvaluatedKey as Record<string, any> | undefined;
+      lastEvaluatedKey = response.LastEvaluatedKey as Record<string, unknown> | undefined;
     } while (lastEvaluatedKey);
 
     return allItems;
@@ -67,25 +70,31 @@ export async function GET(request: NextRequest) {
 
     // Filter by department if specified
     if (department && department !== 'ALL') {
-      filteredEvents = filteredEvents.filter(event => 
-        event.department?.toUpperCase() === department.toUpperCase()
-      );
+      filteredEvents = filteredEvents.filter(event => {
+        const eventDept = (event as { department?: string }).department;
+        return eventDept?.toUpperCase() === department.toUpperCase();
+      });
     }
 
     // Search in title and description if specified
     if (search) {
       const searchTerm = search.toLowerCase();
-      filteredEvents = filteredEvents.filter(event =>
-        event.title?.toLowerCase().includes(searchTerm) ||
-        event.description?.toLowerCase().includes(searchTerm) ||
-        event.tags?.some((tag: string) => tag.toLowerCase().includes(searchTerm))
-      );
+      filteredEvents = filteredEvents.filter(event => {
+        const eventObj = event as { title?: string; description?: string; tags?: string[] };
+        return (
+          eventObj.title?.toLowerCase().includes(searchTerm) ||
+          eventObj.description?.toLowerCase().includes(searchTerm) ||
+          eventObj.tags?.some((tag: string) => tag.toLowerCase().includes(searchTerm))
+        );
+      });
     }
 
     // Sort by date (newest first)
     filteredEvents.sort((a, b) => {
-      const dateA = new Date(a.event_date || 0).getTime();
-      const dateB = new Date(b.event_date || 0).getTime();
+      const eventA = a as { event_date?: string | number };
+      const eventB = b as { event_date?: string | number };
+      const dateA = new Date(eventA.event_date || 0).getTime();
+      const dateB = new Date(eventB.event_date || 0).getTime();
       return dateB - dateA;
     });
 

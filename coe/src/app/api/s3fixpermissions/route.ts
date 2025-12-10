@@ -36,7 +36,7 @@ export async function POST(req: Request) {
         })
       );
       contentType = getObject.ContentType || contentType;
-    } catch (err) {
+    } catch {
       console.warn("Could not get object metadata, using default ContentType");
     }
 
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
         key,
         method: 'CopyObject'
       });
-    } catch (copyErr: any) {
+    } catch (copyErr: unknown) {
       console.warn("CopyObjectCommand failed, trying PutObjectAclCommand:", copyErr);
       
       // Method 2: Fallback to PutObjectAclCommand
@@ -81,12 +81,14 @@ export async function POST(req: Request) {
           key,
           method: 'PutObjectAcl'
         });
-      } catch (aclErr: any) {
+      } catch (aclErr: unknown) {
         console.error("Both methods failed:", { copyErr, aclErr });
         
         // Provide detailed error message
-        const errorMessage = aclErr.message || copyErr.message || "Unknown error";
-        const errorCode = aclErr.Code || copyErr.Code || aclErr.name || copyErr.name;
+        const copyError = copyErr as { message?: string; Code?: string; name?: string };
+        const aclError = aclErr as { message?: string; Code?: string; name?: string };
+        const errorMessage = aclError.message || copyError.message || "Unknown error";
+        const errorCode = aclError.Code || copyError.Code || aclError.name || copyError.name;
         
         return NextResponse.json(
           { 
@@ -99,13 +101,14 @@ export async function POST(req: Request) {
         );
       }
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("S3 fix permissions error:", err);
+    const error = err as { message?: string; Code?: string; name?: string };
     return NextResponse.json(
       { 
         error: "Failed to fix permissions", 
-        details: err.message || "Unknown error",
-        code: err.Code || err.name
+        details: error.message || "Unknown error",
+        code: error.Code || error.name
       },
       { status: 500 }
     );

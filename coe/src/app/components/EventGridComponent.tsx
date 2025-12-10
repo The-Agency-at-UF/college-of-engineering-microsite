@@ -4,7 +4,6 @@ import React, { useEffect, useState, useMemo } from "react";
 import EventCardComponent from "./EventCardComponent";
 import { Event } from "../lib/fakeApiData";
 import { ApiClient } from "../lib/apiClient";
-import { API_CONFIG } from "../lib/apiConfig";
 
 interface EventGridComponentProps {
   selectedDepartment?: string | null;

@@ -21,7 +21,7 @@ export default function CreateMilestonePage() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  function update(e: any) {
+  function update(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
     // Clear file when media type changes
     if (e.target.name === "media_type") {

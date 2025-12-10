@@ -11,7 +11,6 @@ import EventGridComponent from "../components/EventGridComponent";
 export default function Home() {
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const [visibleEventDates, setVisibleEventDates] = useState<string[]>([]);
   const itemsPerPage = 9;
 
@@ -44,7 +43,7 @@ export default function Home() {
             currentPage={currentPage}
             itemsPerPage={itemsPerPage}
             onPageChange={setCurrentPage}
-            onTotalItemsChange={setTotalItems}
+            onTotalItemsChange={() => {}}
             onVisibleEventDatesChange={setVisibleEventDates}
           />
         </div>
