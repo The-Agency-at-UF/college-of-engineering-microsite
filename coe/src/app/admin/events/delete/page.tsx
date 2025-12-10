@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Toast } from "@/app/admin/Toast";
 import { useToast } from "@/app/admin/useToast";
+import { Event } from "@/app/lib/types";
 
 export default function DeleteEventPage() {
   const router = useRouter();
   const { message, showToast } = useToast();
 
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(false);
 

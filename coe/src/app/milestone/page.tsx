@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import MilestoneGridComponent from "../components/MilestoneGridComponent";
 import Footer from "../components/Footer";
 import NavBar from "../components/NavBar";
 import MilestoneCard from "../components/MilestoneComponent";
@@ -15,7 +14,6 @@ export default function MilestonePage() {
   const { milestones, loading, error } = useMilestones();
   const [filterState, setFilterState] = useState<FilterState>({});
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [departmentImages, setDepartmentImages] = useState<string[]>([]);
 
   // Fetch department images - must be called before any conditional returns
@@ -255,6 +253,7 @@ export default function MilestonePage() {
                     title={milestone.title}
                     tags={milestone.themes || []}
                     description={milestone.description}
+                    media_type={milestone.media_type || "image"}
                   />
                 ))
               ) : (

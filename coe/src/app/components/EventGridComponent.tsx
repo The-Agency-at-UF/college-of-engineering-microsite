@@ -4,13 +4,24 @@ import React, { useEffect, useState, useMemo } from "react";
 import EventCardComponent from "./EventCardComponent";
 import { Event } from "../lib/fakeApiData";
 import { ApiClient } from "../lib/apiClient";
-import { API_CONFIG } from "../lib/apiConfig";
 
 interface EventGridComponentProps {
   selectedDepartment?: string | null;
+  currentPage: number;
+  itemsPerPage: number;
+  onPageChange: (page: number) => void;
+  onTotalItemsChange: (total: number) => void;
+  onVisibleEventDatesChange: (dates: string[]) => void;
 }
 
-const EventGridComponent = ({ selectedDepartment }: EventGridComponentProps) => {
+const EventGridComponent = ({ 
+  selectedDepartment,
+  currentPage,
+  itemsPerPage,
+  onPageChange,
+  onTotalItemsChange,
+  onVisibleEventDatesChange
+}: EventGridComponentProps) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +51,38 @@ const EventGridComponent = ({ selectedDepartment }: EventGridComponentProps) => 
     );
   }, [events, selectedDepartment]);
 
+  // Update total items when filtered events change
+  useEffect(() => {
+    onTotalItemsChange(filteredEvents.length);
+  }, [filteredEvents.length, onTotalItemsChange]);
+
+  // Paginate events - show only 9 at a time
+  const paginatedEvents = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredEvents.slice(startIndex, endIndex);
+  }, [filteredEvents, currentPage, itemsPerPage]);
+
+  // Extract dates from visible events and notify parent
+  useEffect(() => {
+    const visibleDates = paginatedEvents.map(event => event.event_date);
+    onVisibleEventDatesChange(visibleDates);
+  }, [paginatedEvents, onVisibleEventDatesChange]);
+
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      onPageChange(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      onPageChange(currentPage + 1);
+    }
+  };
+
   if (loading) {
     return (
       <div className="w-full text-center py-12 text-[#002657] text-lg font-medium">
@@ -67,14 +110,15 @@ const EventGridComponent = ({ selectedDepartment }: EventGridComponentProps) => 
       )} */}
 
       <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 place-items-center pt-10">
-        {filteredEvents.length > 0 ? (
-          filteredEvents.map((event) => (
+        {paginatedEvents.length > 0 ? (
+          paginatedEvents.map((event) => (
             <EventCardComponent
               key={event.event_id}
               title={event.title}
               dateRange={event.event_date}
               description={event.description}
               sourceLabel={`MORE FROM ${event.department}`}
+              imageUrl={event.image_url}
             />
           ))
         ) : (
@@ -86,6 +130,59 @@ const EventGridComponent = ({ selectedDepartment }: EventGridComponentProps) => 
           </div>
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {filteredEvents.length > itemsPerPage && (
+        <div className="flex justify-center items-center gap-4 mt-12">
+          <button
+            onClick={handlePreviousPage}
+            disabled={currentPage === 1}
+            className="px-6 py-2 rounded-md font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: currentPage === 1 ? '#e5e7eb' : '#002657',
+              color: currentPage === 1 ? '#9ca3af' : 'white'
+            }}
+            onMouseEnter={(e) => {
+              if (currentPage > 1) {
+                e.currentTarget.style.backgroundColor = '#001a3d';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (currentPage > 1) {
+                e.currentTarget.style.backgroundColor = '#002657';
+              }
+            }}
+          >
+            Previous
+          </button>
+          
+          <span className="text-[#002657] font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
+          
+          <button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className="px-6 py-2 rounded-md font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: currentPage === totalPages ? '#e5e7eb' : '#002657',
+              color: currentPage === totalPages ? '#9ca3af' : 'white'
+            }}
+            onMouseEnter={(e) => {
+              if (currentPage < totalPages) {
+                e.currentTarget.style.backgroundColor = '#001a3d';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (currentPage < totalPages) {
+                e.currentTarget.style.backgroundColor = '#002657';
+              }
+            }}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </section>
   );
 };

@@ -4,14 +4,16 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/admin/useToast";
 import { Toast } from "@/app/admin/Toast";
+import Image from "next/image";
+import { Event, EventForm } from "@/app/lib/types";
 
 export default function EditEventPage() {
   const router = useRouter();
   const { message, showToast } = useToast();
 
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [selected, setSelected] = useState("");
-  const [form, setForm] = useState<any>(null);
+  const [form, setForm] = useState<EventForm | null>(null);
 
   const [newImage, setNewImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,11 +34,15 @@ export default function EditEventPage() {
       .then((data) => setForm(data));
   }, [selected]);
 
-  function update(e: any) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  function update(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    if (form) {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   }
 
   async function saveChanges() {
+    if (!form) return;
+    
     setLoading(true);
 
     let image_url = form.image_url;
@@ -148,10 +154,12 @@ export default function EditEventPage() {
 
           {/* Current image preview */}
           {form.image_url && (
-            <img
+            <Image
               src={form.image_url}
               alt="event"
-              className="w-40 rounded border"
+              width={160}
+              height={160}
+              className="w-40 rounded border object-cover"
             />
           )}
 

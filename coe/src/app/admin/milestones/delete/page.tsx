@@ -4,12 +4,13 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Toast } from "@/app/admin/Toast";
 import { useToast } from "@/app/admin/useToast";
+import { Milestone } from "@/app/lib/types";
 
 export default function DeleteMilestonePage() {
   const router = useRouter();
-  const { message, showToast } = useToast(); 
+  const { message, showToast } = useToast();
 
-  const [milestones, setMilestones] = useState<any[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [selected, setSelected] = useState("");
   const [loading, setLoading] = useState(false);
 

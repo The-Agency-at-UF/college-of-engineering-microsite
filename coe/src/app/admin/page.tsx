@@ -2,6 +2,7 @@ import { auth } from "@/app/lib/auth";
 import Link from "next/link";
 import { headers } from "next/headers";
 import LogoutButton from "@/app/admin/LogoutButton";
+import { Event, Milestone } from "@/app/lib/types";
 
 async function getAllData() {
   const h = await headers();
@@ -17,18 +18,18 @@ async function getAllData() {
 
     try {
       return await res.json();
-    } catch (e) {
+    } catch {
       console.error("Failed to parse JSON from:", url);
       return null;
     }
   }
 
-  const events = await safeFetch(`${base}/api/events`);
-  const milestones = await safeFetch(`${base}/api/milestones`);
+  const eventsResponse = await safeFetch(`${base}/api/events`);
+  const milestonesResponse = await safeFetch(`${base}/api/milestones`);
 
   return {
-    events: Array.isArray(events) ? events : [],
-    milestones: Array.isArray(milestones) ? milestones : [],
+    events: Array.isArray(eventsResponse?.events) ? eventsResponse.events : (Array.isArray(eventsResponse) ? eventsResponse : []),
+    milestones: Array.isArray(milestonesResponse?.milestones) ? milestonesResponse.milestones : (Array.isArray(milestonesResponse) ? milestonesResponse : []),
   };
 }
 
@@ -116,7 +117,7 @@ export default async function AdminPage() {
           <tbody>
             {/* EVENTS */}
             {Array.isArray(events) &&
-              events.map((ev: any) => (
+              events.map((ev: Event) => (
                 <tr key={ev.event_id} className="hover:bg-[#E6EDF8]">
                   <td className="p-3 border border-[#002657] text-[#002657]">
                     Event
@@ -130,7 +131,7 @@ export default async function AdminPage() {
 
             {/* MILESTONES */}
             {Array.isArray(milestones) &&
-              milestones.map((m: any) => (
+              milestones.map((m: Milestone) => (
                 <tr key={m.milestone_id} className="hover:bg-[#E6EDF8]">
                   <td className="p-3 border border-[#002657] text-[#002657]">
                     Milestone

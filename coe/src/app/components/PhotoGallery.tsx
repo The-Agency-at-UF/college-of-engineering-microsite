@@ -8,15 +8,46 @@ export default function PhotoGallery() {
 
   // Fetch images from API route
   useEffect(() => {
-    fetch("/api/gallery")
-      .then((res) => res.json())
-      .then((data) => {
-        setImages(data);
+    (async () => {
+      try {
+        const res = await fetch("/api/carousel");
+        const data = await res.json();
+
+        // Handle both array response and object with images array
+        if (Array.isArray(data)) {
+          setImages(data);
+          if (data.length === 0) {
+            console.warn("⚠️ Carousel API returned empty array - check server logs for details");
+          }
+        } else if (data.images && Array.isArray(data.images)) {
+          setImages(data.images);
+        } else if (data.error) {
+          console.error("❌ Carousel API error:", data.error);
+          console.error("💡 Make sure S3_BUCKET_C environment variable is set in your .env.local file");
+          setImages([]);
+        } else {
+          console.error("❌ /api/carousel returned unexpected format:", data);
+          setImages([]);
+        }
+      } catch (err) {
+        console.error("❌ Failed to fetch carousel images:", err);
+        setImages([]);
+      } finally {
         setLoaded(true);
-      });
+      }
+    })();
   }, []);
 
   if (!loaded) return null;
+
+  // If no images, return a placeholder or empty div
+  if (images.length === 0) {
+    return (
+      <section className="w-full h-full overflow-hidden bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-400 text-sm">No images available</p>
+      </section>
+    );
+  }
 
   // Split array into 2 columns
   const mid = Math.ceil(images.length / 2);
@@ -41,6 +72,7 @@ export default function PhotoGallery() {
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              unoptimized={src.includes('?')} // Disable optimization for presigned URLs with query params
             />
           </div>
         ))}

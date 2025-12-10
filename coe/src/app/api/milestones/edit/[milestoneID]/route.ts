@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { docClient } from "@/app/lib/dynamoClient";
 import { GetCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 
-const TABLE_NAME = process.env.DYNAMO_TABLE_NAME_M!;
+const TABLE_NAME = process.env.DYNAMO_TABLE_NAME_M || "legacy_milestones";
 
 // GET one milestone
 export async function GET(
@@ -61,7 +61,7 @@ export async function PATCH(
     const fields = Object.keys(filtered);
     const updateExpr = fields.map((f) => `${f} = :${f}`).join(", ");
 
-    const values: any = {};
+    const values: Record<string, unknown> = {};
     fields.forEach((f) => {
       values[`:${f}`] = filtered[f];
     });

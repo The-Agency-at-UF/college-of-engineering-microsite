@@ -18,23 +18,40 @@ export default function CreateMilestonePage() {
     media_type: "image",
   });
 
-  const [image, setImage] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  function update(e: any) {
+  function update(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
+    // Clear file when media type changes
+    if (e.target.name === "media_type") {
+      setFile(null);
+    }
   }
+
+  // Get accept attribute based on media type
+  const getAcceptAttribute = () => {
+    switch (form.media_type) {
+      case "video":
+        return "video/*";
+      case "pdf":
+        return "application/pdf";
+      case "image":
+      default:
+        return "image/*";
+    }
+  };
 
   async function submit() {
     setLoading(true);
 
-    let uploadedImageUrl = null;
+    let uploadedMediaUrl = null;
 
     // STEP 1 — Upload file to S3
-    if (image) {
+    if (file) {
       const formData = new FormData();
       formData.append("kind", "milestone");  // IMPORTANT
-      formData.append("file", image);
+      formData.append("file", file);
 
       const uploadRes = await fetch("/api/s3upload", {
         method: "POST",
@@ -42,7 +59,7 @@ export default function CreateMilestonePage() {
       });
 
       const uploadJson = await uploadRes.json();
-      uploadedImageUrl = uploadJson.imageUrl;
+      uploadedMediaUrl = uploadJson.imageUrl;
     }
 
     // STEP 2 — Save milestone to DynamoDB
@@ -54,7 +71,7 @@ export default function CreateMilestonePage() {
         description: form.description,
         department: form.department,
         milestone_date: form.milestone_date,
-        image_url: uploadedImageUrl,
+        image_url: uploadedMediaUrl,
         tags: form.tags.split(",").map(t => t.trim()).filter(Boolean),
         media_type: form.media_type
       }),
@@ -93,12 +110,17 @@ export default function CreateMilestonePage() {
         <div className="flex flex-col">
           <label className="bg-[#0021A5] text-white px-4 py-2 rounded cursor-pointer w-fit hover:bg-[#001d42]">
             Choose File
-            <input type="file" className="hidden" onChange={(e) => setImage(e.target.files?.[0] ?? null)} />
+            <input 
+              type="file" 
+              className="hidden" 
+              accept={getAcceptAttribute()}
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)} 
+            />
           </label>
 
-          {image && (
+          {file && (
             <p className="text-sm text-green-700 mt-2">
-              Selected file: <span className="font-semibold">{image.name}</span>
+              Selected file: <span className="font-semibold">{file.name}</span>
             </p>
           )}
         </div>

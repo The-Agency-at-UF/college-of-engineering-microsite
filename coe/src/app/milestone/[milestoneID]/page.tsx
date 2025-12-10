@@ -29,21 +29,14 @@ interface Milestone {
   milestone_date?: string;
   image_url?: string;
   tags?: string[];
-}
-
-//Helper function to get a year from the date string
-function extractYear(dateStr?: string): string | undefined {
-  if (!dateStr) return undefined;
-  const match = dateStr.match(/\d{4}/);
-  return match ? match[0] : undefined;
+  media_type?: string;
 }
 
 export default function MilestoneDetailPage() {
   const { milestoneID } = useParams() as { milestoneID: string };
   const router = useRouter();
 
-  //Stores all milestones and the selected current milestone
-  const [allMilestones, setAllMilestones] = useState<Milestone[]>([]);
+  //Stores the selected current milestone
   const [current, setCurrent] = useState<Milestone | null>(null);
 
   //Loading state for when the page is loading (could change to a loading symbol later)
@@ -57,7 +50,6 @@ export default function MilestoneDetailPage() {
         const response = await res.json();
         // API returns { milestones: [...], total, offset, limit, hasMore }
         const milestones: Milestone[] = response.milestones || response || [];
-        setAllMilestones(milestones);
         const found = milestones.find((m) => m.milestone_id === milestoneID) || null;
         setCurrent(found);
       } catch (err) {
@@ -215,15 +207,29 @@ export default function MilestoneDetailPage() {
                 bg-gradient-to-r from-[#F2A900] to-[#774219] -ml-[11vw]" />
             </div>
 
-            {/* RIGHT column: image */}
+            {/* RIGHT column: media (image or video) */}
             <div className="relative w-full max-w-[clamp(220px,70vw,420px)] 
               aspect-[4/3] mx-auto md:mx-0 overflow-hidden bg-[#D1D5DB]">
-              <Image
-                src={current.image_url || "/images/pic1.jpg"}
-                alt={current.title}
-                fill
-                className="object-cover"
-              />
+              {current.media_type === "video" ? (
+                <video
+                  src={current.image_url || ""}
+                  controls
+                  className="w-full h-full object-cover"
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                  onError={() => {
+                    console.error("Video failed to load:", current.image_url);
+                  }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <Image
+                  src={current.image_url || "/images/pic1.jpg"}
+                  alt={current.title}
+                  fill
+                  className="object-cover"
+                />
+              )}
             </div>
           </div>
         </div> 

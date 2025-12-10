@@ -1,6 +1,6 @@
 // API Configuration - Switch between fake and real AWS API
 export const API_CONFIG = {
-  // Set to false to use real AWS API, true for fake local data
+  // Set to false to use real AWS API, true to use local Next.js API routes (which fetch from AWS DynamoDB)
   USE_FAKE_API: true,
   
   // Real AWS API endpoints (set these when AWS is ready)

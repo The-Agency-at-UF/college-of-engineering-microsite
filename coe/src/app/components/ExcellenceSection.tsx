@@ -22,12 +22,6 @@ export default function ExcellenceSection({ selectedDepartment, onDepartmentChan
         onDepartmentChange(dept.dataValue);
     };
 
-    const getSelectedDeptDisplay = () => {
-        if (!selectedDepartment) return null;
-        const dept = departments.find(d => d.dataValue === selectedDepartment);
-        return dept?.name || selectedDepartment;
-    };
-
     return( 
         <section className = "flex flex-col items-center justify-center gap-8 pt-[clamp(15px,3vw,50px)]">
             {/* Blue Banner area */}

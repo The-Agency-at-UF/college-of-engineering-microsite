@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fakeMilestones } from "../../lib/fakeApiData";
 import { docClient } from "../../lib/dynamoClient";
-import { ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { ScanCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
-const TABLE_NAME = "legacy_milestones";
+const TABLE_NAME = process.env.DYNAMO_TABLE_NAME_M || "legacy_milestones";
 
 // Fetch milestones from AWS DynamoDB
 async function fetchAWSMilestones() {
@@ -20,35 +19,9 @@ async function fetchAWSMilestones() {
     const response = await docClient.send(command);
     return response.Items || [];
   } catch (error) {
-    console.warn("Failed to fetch milestones from AWS (will use fake data):", error);
+    console.warn("Failed to fetch milestones from AWS:", error);
     return [];
   }
-}
-
-// Merge AWS and fake data, with AWS data taking precedence
-function mergeMilestoneData(awsMilestones: any[], fakeMilestones: any[]) {
-  // Create a map of AWS milestones by ID for quick lookup
-  const awsMap = new Map(awsMilestones.map(m => [m.milestone_id, m]));
-  
-  // Start with fake milestones, but replace with AWS data if exists
-  const merged: any[] = [];
-  
-  // Add AWS milestones first (they take precedence)
-  for (const awsMilestone of awsMilestones) {
-    merged.push({
-      ...awsMilestone,
-      // Ensure AWS milestones keep their existing image_url if they have one
-    });
-  }
-  
-  // Add fake milestones that don't exist in AWS
-  for (const fakeMilestone of fakeMilestones) {
-    if (!awsMap.has(fakeMilestone.milestone_id)) {
-      merged.push(fakeMilestone);
-    }
-  }
-  
-  return merged;
 }
 
 export async function GET(request: NextRequest) {
@@ -62,9 +35,8 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
 
-    // Fetch from AWS first, then merge with fake data
-    const awsMilestones = await fetchAWSMilestones();
-    let allMilestones = mergeMilestoneData(awsMilestones, fakeMilestones);
+    // Fetch from AWS DynamoDB
+    let allMilestones = await fetchAWSMilestones();
 
     // Filter by department if specified
     if (department && department !== 'ALL') {
@@ -111,25 +83,23 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error("Milestones API Error:", error);
-    // Fallback to fake data only on error
+    // Return empty array on error
     return NextResponse.json({
-      milestones: fakeMilestones,
-      total: fakeMilestones.length,
+      milestones: [],
+      total: 0,
       offset: 0,
-      limit: fakeMilestones.length,
+      limit: 0,
       hasMore: false
     });
   }
 }
 
-// Handle POST for creating new milestones (fake implementation)
+// Handle POST for creating new milestones
 export async function POST(request: NextRequest) {
   try {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
     const milestoneData = await request.json();
     
-    // Generate fake ID and timestamps
+    // Generate milestone ID and timestamps
     const newMilestone = {
       ...milestoneData,
       milestone_id: `mst_${Date.now()}`,
@@ -138,8 +108,15 @@ export async function POST(request: NextRequest) {
       significance_level: milestoneData.significance_level || 'medium'
     };
 
-    // In real app, this would save to database
-    fakeMilestones.push(newMilestone);
+    // Save to DynamoDB
+    if (process.env.AWS_ACCESS_KEY_ID) {
+      await docClient.send(
+        new PutCommand({
+          TableName: TABLE_NAME,
+          Item: newMilestone,
+        })
+      );
+    }
 
     return NextResponse.json({
       success: true,
@@ -148,6 +125,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
+    console.error("Error creating milestone:", error);
     return NextResponse.json(
       { error: "Failed to create milestone", success: false },
       { status: 500 }
