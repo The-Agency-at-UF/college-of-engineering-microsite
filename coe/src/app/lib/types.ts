@@ -1,47 +1,29 @@
+// Type definitions for Events and Milestones
 export interface Event {
   event_id: string;
   title: string;
-  department?: string;
-  event_date?: string;
-  description?: string;
-  tags?: string[];
+  description: string;
+  event_date: string;
+  department: string;
+  tags: string[];
+  event_type?: string;
   image_url?: string;
-  media_type?: string;
-  created_at?: string;
-  updated_at?: string;
+  location?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Milestone {
   milestone_id: string;
   title: string;
-  department?: string;
-  milestone_date?: string;
   description?: string;
-  tags?: string[] | string;
   image_url?: string;
-  media_type?: string;
-  significance_level?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface EventForm {
-  title: string;
-  department: string;
-  event_date: string;
-  description: string;
-  tags: string[];
-  media_type: string;
-  image_url?: string;
-}
-
-export interface MilestoneForm {
-  title: string;
-  department: string;
   milestone_date: string;
-  description: string;
-  tags: string | string[];
-  media_type: string;
-  image_url?: string;
+  department: string;
+  tags?: string[];
+  themes?: string[];
+  media_type?: string; // Changed from media_format to match actual API
+  media_format?: string; // Keep for backward compatibility
+  created_at: string;
+  updated_at: string;
 }
-

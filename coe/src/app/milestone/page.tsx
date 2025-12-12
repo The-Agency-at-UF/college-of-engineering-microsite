@@ -15,6 +15,8 @@ export default function MilestonePage() {
   const [filterState, setFilterState] = useState<FilterState>({});
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const [departmentImages, setDepartmentImages] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
 
   // Fetch department images - must be called before any conditional returns
   useEffect(() => {
@@ -29,10 +31,12 @@ export default function MilestonePage() {
       ...prev,
       [filterId]: selectedValues
     }));
+    setCurrentPage(1); // Reset to first page when filters change
   };
 
   const handleDepartmentClick = (department: string) => {
     setSelectedDepartment(department);
+    setCurrentPage(1); // Reset to first page when department changes
   };
 
   // Define how to filter milestones based on selected filters AND department
@@ -53,9 +57,14 @@ export default function MilestonePage() {
       if (!hasMatchingTheme) return false;
     }
 
-    // Check media formats filter
+    // Check media formats filter - use media_type field which is what's actually stored
     if (filters.mediaFormats && filters.mediaFormats.length > 0) {
-      if (!milestone.media_format || !filters.mediaFormats.includes(milestone.media_format)) {
+      // Check both media_type (actual API field) and media_format (legacy/mock field) for compatibility
+      const milestoneMediaType = (milestone.media_type || (milestone as any).media_format || "image")?.toLowerCase();
+      const matchingFilter = filters.mediaFormats.some(filterValue => 
+        filterValue.toLowerCase() === milestoneMediaType
+      );
+      if (!matchingFilter) {
         return false;
       }
     }
@@ -181,7 +190,7 @@ export default function MilestonePage() {
             }
           }}
         >
-          {["AG BIO", "BME", "CHEM", "CISE", "CIVIL", "EEE", "ESE", "ISE", "MAE", "MSE", "PHY", "ABE"].map((dept, idx) => {
+          {["ECE", "CHEM", "ABE", "MAE", "MSE", "NE", "ISE", "CISE", "BME", "ESSIE", "EED"].map((dept, idx) => {
             const imagePath = getDeptImage(dept, idx);
             return (
               <button
@@ -242,30 +251,113 @@ export default function MilestonePage() {
           filterFunction={filterMilestones}
           filterControlsClassName="flex gap-4 mb-6 justify-end"
         >
-          {(filteredMilestones) => (
-            <div className="grid gap-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 place-items-center">
-              {filteredMilestones.length > 0 ? (
-                filteredMilestones.map((milestone) => (
-                  <MilestoneCard
-                    key={milestone.milestone_id || Math.random()}
-                    id={milestone.milestone_id || String(Math.random())}
-                    imageSrc={milestone.image_url || "/images/pic1.jpg"}
-                    title={milestone.title}
-                    tags={milestone.themes || []}
-                    description={milestone.description}
-                    media_type={milestone.media_type || "image"}
-                  />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-12 text-[#002657] text-lg">
-                  {selectedDepartment ? 
-                    `No milestones found for ${selectedDepartment} ${Object.keys(filterState).length > 0 ? 'matching the selected filters' : ''}` :
-                    'No milestones found matching the selected filters'
-                  }
+          {(filteredMilestones) => {
+            // Calculate pagination
+            const totalPages = Math.ceil(filteredMilestones.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedMilestones = filteredMilestones.slice(startIndex, endIndex);
+
+            const handlePreviousPage = () => {
+              if (currentPage > 1) {
+                setCurrentPage(currentPage - 1);
+              }
+            };
+
+            const handleNextPage = () => {
+              if (currentPage < totalPages) {
+                setCurrentPage(currentPage + 1);
+              }
+            };
+
+            return (
+              <>
+                <div className="grid gap-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 place-items-center">
+                  {paginatedMilestones.length > 0 ? (
+                    paginatedMilestones.map((milestone) => {
+                      // Check multiple possible field names for media URL (image_url, media_url, video_url)
+                      const mediaUrl = milestone.image_url || 
+                                       (milestone as any).media_url || 
+                                       (milestone as any).video_url || 
+                                       "/images/pic1.jpg";
+                      
+                      return (
+                        <MilestoneCard
+                          key={milestone.milestone_id || Math.random()}
+                          id={milestone.milestone_id || String(Math.random())}
+                          imageSrc={mediaUrl}
+                          title={milestone.title}
+                          tags={milestone.themes || []}
+                          description={milestone.description}
+                          media_type={(milestone.media_type || (milestone as any).media_format || "image")}
+                        />
+                      );
+                    })
+                  ) : (
+                    <div className="col-span-full text-center py-12 text-[#002657] text-lg">
+                      {selectedDepartment ? 
+                        `No milestones found for ${selectedDepartment} ${Object.keys(filterState).length > 0 ? 'matching the selected filters' : ''}` :
+                        'No milestones found matching the selected filters'
+                      }
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          )}
+
+                {/* Pagination Controls */}
+                {filteredMilestones.length > itemsPerPage && (
+                  <div className="flex justify-center items-center gap-4 mt-12">
+                    <button
+                      onClick={handlePreviousPage}
+                      disabled={currentPage === 1}
+                      className="px-6 py-2 rounded-md font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        backgroundColor: currentPage === 1 ? '#e5e7eb' : '#002657',
+                        color: currentPage === 1 ? '#9ca3af' : 'white'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (currentPage > 1) {
+                          e.currentTarget.style.backgroundColor = '#001a3d';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (currentPage > 1) {
+                          e.currentTarget.style.backgroundColor = '#002657';
+                        }
+                      }}
+                    >
+                      Previous
+                    </button>
+                    
+                    <span className="text-[#002657] font-medium">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    
+                    <button
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
+                      className="px-6 py-2 rounded-md font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        backgroundColor: currentPage === totalPages ? '#e5e7eb' : '#002657',
+                        color: currentPage === totalPages ? '#9ca3af' : 'white'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (currentPage < totalPages) {
+                          e.currentTarget.style.backgroundColor = '#001a3d';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (currentPage < totalPages) {
+                          e.currentTarget.style.backgroundColor = '#002657';
+                        }
+                      }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
+            );
+          }}
         </FilterSystem>
       </section>
 

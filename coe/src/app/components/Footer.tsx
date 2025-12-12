@@ -26,8 +26,7 @@ export default function Footer() {
 
         {/*Center: Button */}
         <div className="flex items-center">
-          {/*TO DO: put link here*/}
-          <Link href="#">
+          <Link href="https://form.asana.com/?k=tTPn3mXR_5J8I1FRT0LZtw&d=1204798168544586" target="_blank" rel="noopener noreferrer">
           <Image
               src="/images/MemButton.svg"
               alt="Share a Memory Button"

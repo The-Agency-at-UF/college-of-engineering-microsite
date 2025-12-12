@@ -4,7 +4,7 @@ import { ScanCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 
 const TABLE_NAME = process.env.DYNAMO_TABLE_NAME_M || "legacy_milestones";
 
-// Fetch milestones from AWS DynamoDB
+// Fetch milestones from AWS DynamoDB (handles pagination)
 async function fetchAWSMilestones() {
   try {
     if (!process.env.AWS_ACCESS_KEY_ID) {
@@ -12,14 +12,34 @@ async function fetchAWSMilestones() {
       return [];
     }
 
-    const command = new ScanCommand({
-      TableName: TABLE_NAME,
-    });
+    const allItems: Record<string, unknown>[] = [];
+    let lastEvaluatedKey: Record<string, unknown> | undefined = undefined;
 
-    const response = await docClient.send(command);
-    return response.Items || [];
+    do {
+      const scanParams: {
+        TableName: string;
+        ExclusiveStartKey?: Record<string, unknown>;
+      } = {
+        TableName: TABLE_NAME,
+      };
+      
+      if (lastEvaluatedKey) {
+        scanParams.ExclusiveStartKey = lastEvaluatedKey;
+      }
+
+      const command = new ScanCommand(scanParams);
+      const response = await docClient.send(command);
+      
+      if (response.Items) {
+        allItems.push(...response.Items);
+      }
+
+      lastEvaluatedKey = response.LastEvaluatedKey as Record<string, unknown> | undefined;
+    } while (lastEvaluatedKey);
+    
+    
+    return allItems;
   } catch (error) {
-    console.warn("Failed to fetch milestones from AWS:", error);
     return [];
   }
 }
@@ -32,57 +52,69 @@ export async function GET(request: NextRequest) {
     const department = searchParams.get('department');
     const search = searchParams.get('search');
     const significance = searchParams.get('significance');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const limitParam = searchParams.get('limit');
+    const offsetParam = searchParams.get('offset');
+    
+    // Only apply pagination if explicitly requested
+    const limit = limitParam ? parseInt(limitParam) : undefined;
+    const offset = offsetParam ? parseInt(offsetParam) : 0;
 
     // Fetch from AWS DynamoDB
     let allMilestones = await fetchAWSMilestones();
 
     // Filter by department if specified
     if (department && department !== 'ALL') {
-      allMilestones = allMilestones.filter(milestone => 
-        milestone.department?.toUpperCase() === department.toUpperCase()
-      );
+      allMilestones = allMilestones.filter(milestone => {
+        const milestoneDept = (milestone as { department?: string }).department;
+        return milestoneDept?.toUpperCase() === department.toUpperCase();
+      });
     }
 
     // Filter by significance level if specified
     if (significance) {
-      allMilestones = allMilestones.filter(milestone =>
-        milestone.significance_level === significance
-      );
+      allMilestones = allMilestones.filter(milestone => {
+        const milestoneObj = milestone as { significance_level?: string };
+        return milestoneObj.significance_level === significance;
+      });
     }
 
     // Search in title and description if specified
     if (search) {
       const searchTerm = search.toLowerCase();
-      allMilestones = allMilestones.filter(milestone =>
-        milestone.title?.toLowerCase().includes(searchTerm) ||
-        milestone.description?.toLowerCase().includes(searchTerm) ||
-        milestone.tags?.some((tag: string) => tag.toLowerCase().includes(searchTerm))
-      );
+      allMilestones = allMilestones.filter(milestone => {
+        const milestoneObj = milestone as { title?: string; description?: string; tags?: string[] };
+        return (
+          milestoneObj.title?.toLowerCase().includes(searchTerm) ||
+          milestoneObj.description?.toLowerCase().includes(searchTerm) ||
+          milestoneObj.tags?.some((tag: string) => tag.toLowerCase().includes(searchTerm))
+        );
+      });
     }
 
     // Sort by date (newest first)
     allMilestones.sort((a, b) => {
-      const dateA = new Date(a.milestone_date || 0).getTime();
-      const dateB = new Date(b.milestone_date || 0).getTime();
+      const milestoneA = a as { milestone_date?: string | number };
+      const milestoneB = b as { milestone_date?: string | number };
+      const dateA = new Date(milestoneA.milestone_date || 0).getTime();
+      const dateB = new Date(milestoneB.milestone_date || 0).getTime();
       return dateB - dateA;
     });
 
-    // Apply pagination
-    const paginatedMilestones = allMilestones.slice(offset, offset + limit);
+    // Apply pagination only if limit is specified
+    const paginatedMilestones = limit !== undefined 
+      ? allMilestones.slice(offset, offset + limit)
+      : allMilestones;
 
     // Return AWS-style response
     return NextResponse.json({
       milestones: paginatedMilestones,
       total: allMilestones.length,
       offset: offset,
-      limit: limit,
-      hasMore: offset + limit < allMilestones.length
+      limit: limit || allMilestones.length,
+      hasMore: limit !== undefined ? (offset + limit < allMilestones.length) : false
     });
 
   } catch (error) {
-    console.error("Milestones API Error:", error);
     // Return empty array on error
     return NextResponse.json({
       milestones: [],
@@ -125,7 +157,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error("Error creating milestone:", error);
     return NextResponse.json(
       { error: "Failed to create milestone", success: false },
       { status: 500 }

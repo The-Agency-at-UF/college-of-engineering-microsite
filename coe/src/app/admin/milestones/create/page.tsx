@@ -21,8 +21,9 @@ export default function CreateMilestonePage() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
-  function update(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  function update(e: any) {
+    const newValue = e.target.value;
+    setForm({ ...form, [e.target.name]: newValue });
     // Clear file when media type changes
     if (e.target.name === "media_type") {
       setFile(null);
@@ -53,37 +54,59 @@ export default function CreateMilestonePage() {
       formData.append("kind", "milestone");  // IMPORTANT
       formData.append("file", file);
 
-      const uploadRes = await fetch("/api/s3upload", {
-        method: "POST",
-        body: formData,
-      });
+      try {
+        const uploadRes = await fetch("/api/s3upload", {
+          method: "POST",
+          body: formData,
+        });
 
-      const uploadJson = await uploadRes.json();
-      uploadedMediaUrl = uploadJson.imageUrl;
+        const uploadJson = await uploadRes.json();
+
+        if (!uploadRes.ok) {
+          showToast(`Upload failed: ${uploadJson.error || "Unknown error"}`);
+          setLoading(false);
+          return;
+        }
+
+        uploadedMediaUrl = uploadJson.imageUrl;
+      } catch (error) {
+        showToast(`Upload error: ${error instanceof Error ? error.message : "Unknown error"}`);
+        setLoading(false);
+        return;
+      }
     }
 
     // STEP 2 — Save milestone to DynamoDB
-    const awsRes = await fetch("/api/milestones", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: form.title,
-        description: form.description,
-        department: form.department,
-        milestone_date: form.milestone_date,
-        image_url: uploadedMediaUrl,
-        tags: form.tags.split(",").map(t => t.trim()).filter(Boolean),
-        media_type: form.media_type
-      }),
-    });
+    const milestoneData = {
+      title: form.title,
+      description: form.description,
+      department: form.department,
+      milestone_date: form.milestone_date,
+      image_url: uploadedMediaUrl,
+      tags: form.tags.split(",").map(t => t.trim()).filter(Boolean),
+      media_type: form.media_type
+    };
 
-    setLoading(false);
+    try {
+      const awsRes = await fetch("/api/milestones", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(milestoneData),
+      });
 
-    if (awsRes.ok) {
-      showToast("Milestone created successfully!");
-      setTimeout(() => router.push("/admin"), 800);
-    } else {
-      showToast("Error creating milestone");
+      const awsJson = await awsRes.json();
+
+      setLoading(false);
+
+      if (awsRes.ok) {
+        showToast("Milestone created successfully!");
+        setTimeout(() => router.push("/admin"), 800);
+      } else {
+        showToast(`Error creating milestone: ${awsJson.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      setLoading(false);
+      showToast(`Error creating milestone: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 
@@ -114,7 +137,10 @@ export default function CreateMilestonePage() {
               type="file" 
               className="hidden" 
               accept={getAcceptAttribute()}
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)} 
+              onChange={(e) => {
+                const selectedFile = e.target.files?.[0] ?? null;
+                setFile(selectedFile);
+              }} 
             />
           </label>
 

@@ -7,15 +7,17 @@ export interface Department {
 
 export const DEPARTMENTS: Department[] = [
   { id: "all", name: "ALL", fullName: "All Departments" },
-  { id: "cise", name: "CISE", fullName: "Computer & Information Science & Engineering" },
-  { id: "agbio", name: "AG BIO", fullName: "Agricultural & Biological Engineering" },
-  { id: "bme", name: "BME", fullName: "Biomedical Engineering" },
+  { id: "ece", name: "ECE", fullName: "Electrical & Computer Engineering" },
   { id: "chem", name: "CHEM", fullName: "Chemical Engineering" },
-  { id: "civil", name: "CIVIL", fullName: "Civil & Coastal Engineering" },
-  { id: "ese", name: "ESE", fullName: "Environmental & Sustainable Engineering" },
-  { id: "ise", name: "ISE", fullName: "Industrial & Systems Engineering" },
-  { id: "mse", name: "MSE", fullName: "Materials Science & Engineering" },
+  { id: "abe", name: "ABE", fullName: "Agricultural & Biological Engineering" },
   { id: "mae", name: "MAE", fullName: "Mechanical & Aerospace Engineering" },
+  { id: "mse", name: "MSE", fullName: "Materials Science & Engineering" },
+  { id: "ne", name: "NE", fullName: "Nuclear Engineering" },
+  { id: "ise", name: "ISE", fullName: "Industrial & Systems Engineering" },
+  { id: "cise", name: "CISE", fullName: "Computer & Information Science & Engineering" },
+  { id: "bme", name: "BME", fullName: "Biomedical Engineering" },
+  { id: "essie", name: "ESSIE", fullName: "Engineering School of Sustainable Infrastructure & Environment" },
+  { id: "eed", name: "EED", fullName: "Engineering Education" },
 ];
 
 // Filter configurations for milestones
@@ -43,10 +45,7 @@ export const MILESTONE_FILTER_CONFIGS = [
     options: [
       { id: "media_1", label: "IMAGE", value: "image" },
       { id: "media_2", label: "VIDEO", value: "video" },
-      { id: "media_3", label: "DOCUMENT", value: "document" },
-      { id: "media_4", label: "AUDIO", value: "audio" },
-      { id: "media_5", label: "INTERACTIVE", value: "interactive" },
-      { id: "media_6", label: "PRESENTATION", value: "presentation" }
+      { id: "media_3", label: "PDF", value: "pdf" }
     ]
   }
 ];
@@ -74,15 +73,17 @@ export const EVENT_FILTER_CONFIGS = [
     label: "DEPARTMENTS",
     multiSelect: true,
     options: [
-      { id: "dept_1", label: "BME", value: "BME" },
-      { id: "dept_2", label: "CISE", value: "CISE" },
-      { id: "dept_3", label: "CIVIL", value: "CIVIL" },
-      { id: "dept_4", label: "CHEM", value: "CHEM" },
+      { id: "dept_1", label: "ECE", value: "ECE" },
+      { id: "dept_2", label: "CHEM", value: "CHEM" },
+      { id: "dept_3", label: "ABE", value: "ABE" },
+      { id: "dept_4", label: "MAE", value: "MAE" },
       { id: "dept_5", label: "MSE", value: "MSE" },
-      { id: "dept_6", label: "ABE", value: "ABE" },
-      { id: "dept_7", label: "MAE", value: "MAE" },
-      { id: "dept_8", label: "ESE", value: "ESE" },
-      { id: "dept_9", label: "EEE", value: "EEE" }
+      { id: "dept_6", label: "NE", value: "NE" },
+      { id: "dept_7", label: "ISE", value: "ISE" },
+      { id: "dept_8", label: "CISE", value: "CISE" },
+      { id: "dept_9", label: "BME", value: "BME" },
+      { id: "dept_10", label: "ESSIE", value: "ESSIE" },
+      { id: "dept_11", label: "EED", value: "EED" }
     ]
   }
 ];

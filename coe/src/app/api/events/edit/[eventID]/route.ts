@@ -21,7 +21,6 @@ export async function GET(
 
     return NextResponse.json(result.Item ?? {});
   } catch (err) {
-    console.error("GET event error:", err);
     return NextResponse.json({ error: "Failed to fetch event" }, { status: 500 });
   }
 }
@@ -72,7 +71,6 @@ export async function PATCH(
       updated_fields: filtered,
     });
   } catch (err) {
-    console.error("PATCH event error:", err);
     return NextResponse.json({ error: "Failed to update event" }, { status: 500 });
   }
 }

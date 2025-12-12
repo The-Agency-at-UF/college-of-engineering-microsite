@@ -10,8 +10,6 @@ export async function DELETE(
 ) {
   const { milestoneID } = await context.params; 
 
-  console.log("DELETE called for milestoneID:", milestoneID);
-
   try {
     await docClient.send(
       new DeleteCommand({
@@ -25,9 +23,8 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (err) {
-    console.error("Error deleting milestone:", err);
     return NextResponse.json(
-      { error: "Failed to delete milestone", details: err },
+      { error: "Failed to delete milestone" },
       { status: 500 }
     );
   }

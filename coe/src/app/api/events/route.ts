@@ -7,12 +7,8 @@ const TABLE_NAME = process.env.DYNAMO_TABLE_NAME || "legacy_events";
 // Fetch events from AWS DynamoDB (handles pagination)
 async function fetchAWSEvents() {
   try {
-    console.log('🔍 fetchAWSEvents called');
-    console.log('🔑 AWS_ACCESS_KEY_ID exists:', !!process.env.AWS_ACCESS_KEY_ID);
-    
     if (!process.env.AWS_ACCESS_KEY_ID) {
       // AWS credentials not configured, skip AWS fetch
-      console.warn('⚠️ AWS credentials not configured, returning empty array');
       return [];
     }
 
@@ -43,14 +39,12 @@ async function fetchAWSEvents() {
 
     return allItems;
   } catch (error) {
-    console.warn("Failed to fetch events from AWS:", error);
     return [];
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('🚀 GET /api/events called');
     const { searchParams } = new URL(request.url);
     
     // Support query parameters for filtering/searching
@@ -65,8 +59,6 @@ export async function GET(request: NextRequest) {
 
     // Fetch from AWS (gets all events)
     let filteredEvents = await fetchAWSEvents();
-    console.log(`📊 Total events fetched from AWS: ${filteredEvents.length}`);
-    console.log('📋 All events:', JSON.stringify(filteredEvents, null, 2));
 
     // Filter by department if specified
     if (department && department !== 'ALL') {
@@ -103,9 +95,6 @@ export async function GET(request: NextRequest) {
       ? filteredEvents.slice(offset, offset + limit)
       : filteredEvents;
 
-    console.log(`✅ Returning ${paginatedEvents.length} events (total: ${filteredEvents.length})`);
-    console.log('🎯 Events being returned:', JSON.stringify(paginatedEvents, null, 2));
-
     // Return AWS-style response
     return NextResponse.json({
       events: paginatedEvents,
@@ -116,7 +105,6 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error("Events API Error:", error);
     return NextResponse.json(
       { error: "Failed to fetch events", events: [] },
       { status: 500 }
@@ -154,7 +142,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error("Error creating event:", error);
     return NextResponse.json(
       { error: "Failed to create event", success: false },
       { status: 500 }

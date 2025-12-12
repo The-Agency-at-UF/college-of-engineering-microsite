@@ -16,21 +16,14 @@ export default function PhotoGallery() {
         // Handle both array response and object with images array
         if (Array.isArray(data)) {
           setImages(data);
-          if (data.length === 0) {
-            console.warn("⚠️ Carousel API returned empty array - check server logs for details");
-          }
         } else if (data.images && Array.isArray(data.images)) {
           setImages(data.images);
         } else if (data.error) {
-          console.error("❌ Carousel API error:", data.error);
-          console.error("💡 Make sure S3_BUCKET_C environment variable is set in your .env.local file");
           setImages([]);
         } else {
-          console.error("❌ /api/carousel returned unexpected format:", data);
           setImages([]);
         }
       } catch (err) {
-        console.error("❌ Failed to fetch carousel images:", err);
         setImages([]);
       } finally {
         setLoaded(true);

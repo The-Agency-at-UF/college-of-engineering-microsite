@@ -6,16 +6,17 @@ interface ExcellenceSectionProps {
 export default function ExcellenceSection({ selectedDepartment, onDepartmentChange }: ExcellenceSectionProps) {
     const departments = [
         { id: "all", name: "ALL", dataValue: null },
-        { id: "cise", name: "CISE", dataValue: "CISE" },
-        { id: "agbio", name: "AG BIO", dataValue: "ABE" }, // Maps to ABE in data
-        { id: "bme", name: "BME", dataValue: "BME" },
+        { id: "ece", name: "ECE", dataValue: "ECE" },
         { id: "chem", name: "CHEM", dataValue: "CHEM" },
-        { id: "civil", name: "CIVIL", dataValue: "CIVIL" },
-        { id: "ese", name: "ESE", dataValue: "ESE" },
-        { id: "ise", name: "ISE", dataValue: "ISE" }, // Added back missing ISE
+        { id: "abe", name: "ABE", dataValue: "ABE" },
         { id: "mae", name: "MAE", dataValue: "MAE" },
         { id: "mse", name: "MSE", dataValue: "MSE" },
-        { id: "eee", name: "EEE", dataValue: "EEE" }
+        { id: "ne", name: "NE", dataValue: "NE" },
+        { id: "ise", name: "ISE", dataValue: "ISE" },
+        { id: "cise", name: "CISE", dataValue: "CISE" },
+        { id: "bme", name: "BME", dataValue: "BME" },
+        { id: "essie", name: "ESSIE", dataValue: "ESSIE" },
+        { id: "eed", name: "EED", dataValue: "EED" }
     ];
 
     const handleDepartmentClick = (dept: typeof departments[0]) => {

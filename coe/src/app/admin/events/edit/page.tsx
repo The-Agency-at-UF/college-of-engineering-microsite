@@ -5,7 +5,27 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/app/admin/useToast";
 import { Toast } from "@/app/admin/Toast";
 import Image from "next/image";
-import { Event, EventForm } from "@/app/lib/types";
+
+interface Event {
+  event_id: string;
+  title: string;
+  description: string;
+  event_date: string;
+  department: string;
+  tags: string[];
+  image_url?: string;
+  media_type?: string;
+}
+
+interface EventForm {
+  title: string;
+  description: string;
+  event_date: string;
+  department: string;
+  tags: string[];
+  image_url?: string;
+  media_type?: string;
+}
 
 export default function EditEventPage() {
   const router = useRouter();
@@ -53,27 +73,48 @@ export default function EditEventPage() {
       formData.append("file", newImage);
       formData.append("kind", "event");
 
-      const upload = await fetch("/api/s3upload", { method: "POST", body: formData });
-      const json = await upload.json();
+      try {
+        const upload = await fetch("/api/s3upload", { method: "POST", body: formData });
+        const json = await upload.json();
 
-      image_url = json.imageUrl;
+        if (!upload.ok) {
+          showToast(`Upload failed: ${json.error || "Unknown error"}`);
+          setLoading(false);
+          return;
+        }
+
+        image_url = json.imageUrl;
+      } catch (error) {
+        showToast(`Upload error: ${error instanceof Error ? error.message : "Unknown error"}`);
+        setLoading(false);
+        return;
+      }
     }
 
-    const res = await fetch(`/api/events/edit/${selected}`, {
-      method: "PATCH",
-      body: JSON.stringify({
-        ...form,
-        image_url,
-      }),
-    });
+    const updateData = {
+      ...form,
+      image_url,
+    };
 
-    setLoading(false);
+    try {
+      const res = await fetch(`/api/events/edit/${selected}`, {
+        method: "PATCH",
+        body: JSON.stringify(updateData),
+      });
 
-    if (res.ok) {
-      showToast("Event updated successfully!");
-      setTimeout(() => router.push("/admin"), 800);
-    } else {
-      showToast("Failed to update event.");
+      const resJson = await res.json();
+
+      setLoading(false);
+
+      if (res.ok) {
+        showToast("Event updated successfully!");
+        setTimeout(() => router.push("/admin"), 800);
+      } else {
+        showToast(`Failed to update event: ${resJson.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      setLoading(false);
+      showToast(`Failed to update event: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 
@@ -170,7 +211,10 @@ export default function EditEventPage() {
               <input
                 type="file"
                 className="hidden"
-                onChange={(e) => setNewImage(e.target.files?.[0] ?? null)}
+                onChange={(e) => {
+                  const selectedFile = e.target.files?.[0] ?? null;
+                  setNewImage(selectedFile);
+                }}
               />
             </label>
 

@@ -28,7 +28,5 @@ export const getApiEndpoint = (endpoint: string) => {
 
 // Utility to log API calls for debugging
 export const logApiCall = (endpoint: string, type: 'fake' | 'aws') => {
-  if (API_CONFIG.LOG_API_CALLS) {
-    console.log(`🔌 API Call: ${endpoint} (using ${type} data)`);
-  }
+  // Logging removed for security
 };

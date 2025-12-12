@@ -21,7 +21,6 @@ export async function GET(
 
     return NextResponse.json(result.Item ?? {});
   } catch (err) {
-    console.error("GET milestone error:", err);
     return NextResponse.json(
       { error: "Failed to fetch milestone" },
       { status: 500 }
@@ -81,7 +80,6 @@ export async function PATCH(
       updated_fields: filtered,
     });
   } catch (err) {
-    console.error("PATCH milestone error:", err);
     return NextResponse.json(
       { error: "Failed to update milestone" },
       { status: 500 }
