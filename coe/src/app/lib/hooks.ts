@@ -30,7 +30,6 @@ export const useMilestones = (): UseMilestonesReturn => {
         setMilestones(milestonesData);
         setUsingMockData(false); // Using ApiClient which handles fake/real switching
       } catch (err) {
-        console.error("Failed to fetch milestones:", err);
         setError(err instanceof Error ? err.message : "Failed to fetch milestones");
         setMilestones([]);
         setUsingMockData(true);
@@ -59,7 +58,6 @@ export const useEvents = (): UseEventsReturn => {
         setEvents(eventsData);
         setUsingMockData(false); // Using ApiClient which handles fake/real switching
       } catch (err) {
-        console.error("Failed to fetch events:", err);
         setError(err instanceof Error ? err.message : "Failed to fetch events");
         setEvents([]);
         setUsingMockData(true);

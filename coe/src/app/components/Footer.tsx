@@ -26,8 +26,7 @@ export default function Footer() {
 
         {/*Center: Button */}
         <div className="flex items-center">
-          {/*TO DO: put link here*/}
-          <Link href="#">
+          <Link href="https://form.asana.com/?k=tTPn3mXR_5J8I1FRT0LZtw&d=1204798168544586" target="_blank" rel="noopener noreferrer">
           <Image
               src="/images/MemButton.svg"
               alt="Share a Memory Button"
@@ -47,10 +46,10 @@ export default function Footer() {
             text-white
             text-[clamp(6px,.8vw,18px)]">
 
-            <Link href="https://giving.ufl.edu/campaigns/62638/donations/new?designation=F009311&recurring=&utm_campaign=&amt=1000" className="underline underline-offset-2">
+            <Link href="https://giving.ufl.edu/campaigns/62638/donations/new?designation=F009311&recurring=&utm_campaign=&amt=1000" className="underline underline-offset-2" target="_blank" rel="noopener noreferrer">
               DONATE
             </Link>
-            <Link href="https://www.eng.ufl.edu/" className="underline underline-offset-2">
+            <Link href="https://www.eng.ufl.edu/" className="underline underline-offset-2" target="_blank" rel="noopener noreferrer">
               LEARN MORE
             </Link>
           </nav>
@@ -58,7 +57,7 @@ export default function Footer() {
           {/*Social Media Icons*/}
           <div className="flex items-end gap-2">
           {/*Used SVG from figma to directly change fill color to gold on hover*/}
-            <Link href="https://www.instagram.com/ufwertheim/" className="group">
+            <Link href="https://www.instagram.com/ufwertheim/" className="group" target="_blank" rel="noopener noreferrer">
               <svg 
               width="34" height="34" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg"
               className="w-[clamp(15px,1.6vw,40px)] h-auto text-white group-hover:text-[#F2A900] transition-colors duration-300">
@@ -67,7 +66,7 @@ export default function Footer() {
             </Link>
 
 
-            <Link href="https://x.com/UFWertheim" className="group">
+            <Link href="https://x.com/UFWertheim" className="group" target="_blank" rel="noopener noreferrer">
               <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg"
               className="w-[clamp(15px,1.6vw,40px)] h-auto text-white group-hover:text-[#F2A900] transition-colors duration-300">
               <path d="M28.5215 28.1177L20.2074 15.0516L28.4113 6.02703C28.5968 5.81788 28.6924 5.54403 28.6774 5.26485C28.6624 4.98567 28.5379 4.72366 28.331 4.53562C28.1241 4.34759 27.8514 4.24868 27.5721 4.26035C27.2928 4.27202 27.0293 4.39333 26.8388 4.59797L19.0241 13.1936L13.6465 4.74273C13.5506 4.5918 13.4182 4.46751 13.2615 4.38138C13.1048 4.29524 12.9288 4.25006 12.75 4.25H6.37502C6.18452 4.24991 5.99749 4.30104 5.83353 4.39803C5.66957 4.49503 5.5347 4.63432 5.44305 4.80133C5.3514 4.96834 5.30633 5.15692 5.31258 5.34732C5.31882 5.53773 5.37614 5.72295 5.47854 5.88359L13.7926 18.9484L5.58877 27.9796C5.49297 28.0825 5.41855 28.2034 5.36982 28.3353C5.32108 28.4672 5.29901 28.6074 5.30488 28.7479C5.31075 28.8884 5.34444 29.0263 5.40401 29.1537C5.46357 29.281 5.54782 29.3953 5.65187 29.4899C5.75593 29.5844 5.87771 29.6574 6.01017 29.7046C6.14263 29.7517 6.28313 29.7721 6.42353 29.7645C6.56393 29.757 6.70143 29.7216 6.82807 29.6605C6.95471 29.5995 7.06797 29.5138 7.16127 29.4087L14.976 20.813L20.3535 29.2639C20.4502 29.4136 20.583 29.5366 20.7397 29.6215C20.8963 29.7065 21.0718 29.7507 21.25 29.75H27.625C27.8153 29.7499 28.0021 29.6988 28.1659 29.6018C28.3296 29.5049 28.4644 29.3658 28.556 29.199C28.6476 29.0322 28.6927 28.8438 28.6867 28.6536C28.6806 28.4634 28.6236 28.2784 28.5215 28.1177ZM21.8331 27.625L8.3101 6.375H12.1617L25.6899 27.625H21.8331Z" fill="currentColor"/>
@@ -81,7 +80,7 @@ export default function Footer() {
               </svg>
             </Link>
 
-            <Link href="https://www.eng.ufl.edu/" className="group">
+            <Link href="https://www.eng.ufl.edu/" className="group" target="_blank" rel="noopener noreferrer">
               <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"
               className="w-[clamp(15px,1.6vw,40px)] h-auto text-white group-hover:text-[#F2A900] transition-colors duration-300">
               <path d="M13.8125 0C11.0807 0 8.41014 0.810089 6.13869 2.32783C3.86724 3.84556 2.09686 6.00278 1.05142 8.52668C0.00598474 11.0506 -0.267549 13.8278 0.26541 16.5072C0.798368 19.1865 2.11388 21.6477 4.04559 23.5794C5.97731 25.5111 8.43846 26.8266 11.1178 27.3596C13.7972 27.8926 16.5744 27.619 19.0983 26.5736C21.6222 25.5281 23.7794 23.7578 25.2972 21.4863C26.8149 19.2149 27.625 16.5444 27.625 13.8125C27.6208 10.1505 26.1642 6.63968 23.5748 4.05025C20.9853 1.46081 17.4745 0.0042181 13.8125 0ZM25.5 13.8125C25.5009 14.8904 25.3521 15.9631 25.0577 17H19.9431C20.269 14.8875 20.269 12.7375 19.9431 10.625H25.0577C25.3521 11.6619 25.5009 12.7346 25.5 13.8125ZM10.3594 19.125H17.2656C16.5852 21.3544 15.4041 23.3987 13.8125 25.1016C12.2215 23.3982 11.0405 21.3541 10.3594 19.125ZM9.84141 17C9.47663 14.8907 9.47663 12.7343 9.84141 10.625H17.7942C18.159 12.7343 18.159 14.8907 17.7942 17H9.84141ZM2.12501 13.8125C2.12408 12.7346 2.27293 11.6619 2.56727 10.625H7.68188C7.35604 12.7375 7.35604 14.8875 7.68188 17H2.56727C2.27293 15.9631 2.12408 14.8904 2.12501 13.8125ZM17.2656 8.5H10.3594C11.0398 6.27062 12.2209 4.22634 13.8125 2.52344C15.4035 4.22678 16.5846 6.27092 17.2656 8.5ZM24.2157 8.5H19.4849C18.8887 6.31245 17.8837 4.25754 16.5232 2.44375C18.167 2.83864 19.706 3.58431 21.0347 4.62965C22.3634 5.67499 23.4503 6.99528 24.221 8.5H24.2157ZM11.1018 2.44375C9.74127 4.25754 8.73634 6.31245 8.14008 8.5H3.40399C4.17466 6.99528 5.2616 5.67499 6.59028 4.62965C7.91896 3.58431 9.45797 2.83864 11.1018 2.44375ZM3.40399 19.125H8.14008C8.73634 21.3125 9.74127 23.3675 11.1018 25.1812C9.45797 24.7864 7.91896 24.0407 6.59028 22.9953C5.2616 21.95 4.17466 20.6297 3.40399 19.125ZM16.5232 25.1812C17.8837 23.3675 18.8887 21.3125 19.4849 19.125H24.221C23.4503 20.6297 22.3634 21.95 21.0347 22.9953C19.706 24.0407 18.167 24.7864 16.5232 25.1812Z" fill="currentColor"/>

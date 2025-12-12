@@ -28,6 +28,8 @@ interface Milestone {
   department?: string;
   milestone_date?: string;
   image_url?: string;
+  media_url?: string;
+  video_url?: string;
   tags?: string[];
   media_type?: string;
 }
@@ -53,7 +55,6 @@ export default function MilestoneDetailPage() {
         const found = milestones.find((m) => m.milestone_id === milestoneID) || null;
         setCurrent(found);
       } catch (err) {
-        console.error("Failed to load milestones", err);
       } finally {
         setLoading(false);
       }
@@ -210,26 +211,31 @@ export default function MilestoneDetailPage() {
             {/* RIGHT column: media (image or video) */}
             <div className="relative w-full max-w-[clamp(220px,70vw,420px)] 
               aspect-[4/3] mx-auto md:mx-0 overflow-hidden bg-[#D1D5DB]">
-              {current.media_type === "video" ? (
-                <video
-                  src={current.image_url || ""}
-                  controls
-                  className="w-full h-full object-cover"
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                  onError={() => {
-                    console.error("Video failed to load:", current.image_url);
-                  }}
-                >
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
-                <Image
-                  src={current.image_url || "/images/pic1.jpg"}
-                  alt={current.title}
-                  fill
-                  className="object-cover"
-                />
-              )}
+              {(() => {
+                // Check multiple possible field names for media URL (image_url, media_url, video_url)
+                const mediaUrl = current.image_url || 
+                                 current.media_url || 
+                                 current.video_url || 
+                                 (current.media_type === "video" ? "" : "/images/pic1.jpg");
+                
+                return current.media_type === "video" ? (
+                  <video
+                    src={mediaUrl}
+                    controls
+                    className="w-full h-full object-cover"
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <Image
+                    src={mediaUrl}
+                    alt={current.title}
+                    fill
+                    className="object-cover"
+                  />
+                );
+              })()}
             </div>
           </div>
         </div> 

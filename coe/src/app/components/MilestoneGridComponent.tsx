@@ -26,13 +26,11 @@ const MilestoneGridComponent = () => {
         } else if (data.milestones && Array.isArray(data.milestones)) {
           milestonesArray = data.milestones;
         } else {
-          console.warn("API returned unexpected data format:", data);
           milestonesArray = [];
         }
         
         setAllMilestones(milestonesArray);
       } catch (error) {
-        console.error("❌ Failed to fetch milestones:", error);
         setError(error instanceof Error ? error.message : "An unknown error occurred");
         setAllMilestones([]); // Ensure it's still an array on error
       } finally {
@@ -64,16 +62,24 @@ const MilestoneGridComponent = () => {
       <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 place-items-center pt-10">
         {/* Ensure allMilestones is an array before mapping */}
         {Array.isArray(allMilestones) && allMilestones.length > 0 ? (
-          allMilestones.map((milestone: { milestone_id?: string; image_url?: string; title?: string; tags?: string[]; media_type?: string }) => (
-            <MilestoneCard
-              key={milestone.milestone_id || Math.random()}
-              id={milestone.milestone_id || String(Math.random())}
-              imageSrc={milestone.image_url || "/images/pic1.jpg"}
-              title={milestone.title || "Untitled Milestone"}
-              tags={milestone.tags || []}
-              media_type={milestone.media_type || "image"}
-            />
-          ))
+          allMilestones.map((milestone: { milestone_id?: string; image_url?: string; title?: string; tags?: string[]; media_type?: string; media_url?: string; video_url?: string }) => {
+            // Check multiple possible field names for media URL (image_url, media_url, video_url)
+            const mediaUrl = milestone.image_url || 
+                             milestone.media_url || 
+                             milestone.video_url || 
+                             "/images/pic1.jpg";
+            
+            return (
+              <MilestoneCard
+                key={milestone.milestone_id || Math.random()}
+                id={milestone.milestone_id || String(Math.random())}
+                imageSrc={mediaUrl}
+                title={milestone.title || "Untitled Milestone"}
+                tags={milestone.tags || []}
+                media_type={milestone.media_type || "image"}
+              />
+            );
+          })
         ) : (
           <div className="col-span-full text-center py-12 text-[#002657] text-lg">
             No milestones available

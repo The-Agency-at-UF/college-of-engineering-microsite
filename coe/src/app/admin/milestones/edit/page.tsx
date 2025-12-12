@@ -5,7 +5,27 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/app/admin/useToast";
 import { Toast } from "@/app/admin/Toast";
 import Image from "next/image";
-import { Milestone, MilestoneForm } from "@/app/lib/types";
+
+interface Milestone {
+  milestone_id: string;
+  title: string;
+  description?: string;
+  image_url?: string;
+  milestone_date: string;
+  department: string;
+  tags?: string[];
+  media_type?: string;
+}
+
+interface MilestoneForm {
+  title: string;
+  description?: string;
+  image_url?: string;
+  milestone_date: string;
+  department: string;
+  tags?: string | string[];
+  media_type?: string;
+}
 
 export default function EditMilestonePage() {
   const router = useRouter();
@@ -78,9 +98,22 @@ export default function EditMilestonePage() {
       formData.append("file", newFile);
       formData.append("kind", "milestone");
 
-      const upload = await fetch("/api/s3upload", { method: "POST", body: formData });
-      const json = await upload.json();
-      image_url = json.imageUrl;
+      try {
+        const upload = await fetch("/api/s3upload", { method: "POST", body: formData });
+        const json = await upload.json();
+
+        if (!upload.ok) {
+          showToast(`Upload failed: ${json.error || "Unknown error"}`);
+          setLoading(false);
+          return;
+        }
+
+        image_url = json.imageUrl;
+      } catch (error) {
+        showToast(`Upload error: ${error instanceof Error ? error.message : "Unknown error"}`);
+        setLoading(false);
+        return;
+      }
     }
 
     // Handle tags - convert string to array if needed
@@ -90,22 +123,31 @@ export default function EditMilestonePage() {
       ? form.tags
       : [];
 
-    const res = await fetch(`/api/milestones/edit/${selected}`, {
-      method: "PATCH",
-      body: JSON.stringify({
-        ...form,
-        image_url,
-        tags: tagsArray,
-      }),
-    });
+    const updateData = {
+      ...form,
+      image_url,
+      tags: tagsArray,
+    };
 
-    setLoading(false);
+    try {
+      const res = await fetch(`/api/milestones/edit/${selected}`, {
+        method: "PATCH",
+        body: JSON.stringify(updateData),
+      });
 
-    if (res.ok) {
-      showToast("Milestone updated successfully!");
-      setTimeout(() => router.push("/admin"), 800);
-    } else {
-      showToast("Failed to update milestone.");
+      const resJson = await res.json();
+
+      setLoading(false);
+
+      if (res.ok) {
+        showToast("Milestone updated successfully!");
+        setTimeout(() => router.push("/admin"), 800);
+      } else {
+        showToast(`Failed to update milestone: ${resJson.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      setLoading(false);
+      showToast(`Failed to update milestone: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 
@@ -209,7 +251,10 @@ export default function EditMilestonePage() {
                 type="file"
                 className="hidden"
                 accept={getAcceptAttribute()}
-                onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
+                onChange={(e) => {
+                  const selectedFile = e.target.files?.[0] ?? null;
+                  setNewFile(selectedFile);
+                }}
               />
             </label>
 

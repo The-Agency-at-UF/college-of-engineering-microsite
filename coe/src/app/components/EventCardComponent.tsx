@@ -36,11 +36,6 @@ const EventCardComponent: React.FC<EventCardProps> = ({
 
   return (
     <div className="relative w-[320px] flex flex-col items-center font-['IBM Plex Sans']">
-      {/* Top label with text arrows */}
-      <p className="text-[#002657] text-[14px] font-[400] italic leading-[100%] mb-[8px] text-center">
-        ← {sourceLabel} →
-      </p>
-
       {/* Image box */}
       <div className="w-[280px] h-[190px] border-2 border-[#0021A5] bg-gray-300 z-20 relative overflow-hidden">
         <Image

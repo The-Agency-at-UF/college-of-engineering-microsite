@@ -11,8 +11,6 @@ export async function DELETE(
 ) {
   const { eventID } = await context.params; 
 
-  console.log("DELETE called for eventID:", eventID);
-
   try {
     const command = new DeleteItemCommand({
       TableName: TABLE_NAME,
@@ -26,9 +24,8 @@ export async function DELETE(
       { status: 200 }
     );
   } catch (err) {
-    console.error("Error deleting event:", err);
     return NextResponse.json(
-      { error: "Failed to delete event", details: err },
+      { error: "Failed to delete event" },
       { status: 500 }
     );
   }

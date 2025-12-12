@@ -23,8 +23,8 @@ export interface Milestone {
   department: string;
   tags?: string[];
   themes?: string[];
-  media_format?: string;
-  media_type?: string;
+  media_type?: string; // Changed from media_format to match actual API
+  media_format?: string; // Keep for backward compatibility
   created_at: string;
   updated_at: string;
 }

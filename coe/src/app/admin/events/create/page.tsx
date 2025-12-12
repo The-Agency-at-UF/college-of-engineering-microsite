@@ -24,7 +24,8 @@ export default function CreateEventPage() {
   function update(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const newValue = e.target.value;
+    setForm({ ...form, [e.target.name]: newValue });
   }
 
   async function submit() {
@@ -38,37 +39,59 @@ export default function CreateEventPage() {
       formData.append("kind", "event");   // IMPORTANT: event upload bucket
       formData.append("file", image);
 
-      const uploadRes = await fetch("/api/s3upload", {
-        method: "POST",
-        body: formData,
-      });
+      try {
+        const uploadRes = await fetch("/api/s3upload", {
+          method: "POST",
+          body: formData,
+        });
 
-      const uploadJson = await uploadRes.json();
-      uploadedImageUrl = uploadJson.imageUrl;
+        const uploadJson = await uploadRes.json();
+
+        if (!uploadRes.ok) {
+          showToast(`Upload failed: ${uploadJson.error || "Unknown error"}`);
+          setLoading(false);
+          return;
+        }
+
+        uploadedImageUrl = uploadJson.imageUrl;
+      } catch (error) {
+        showToast(`Upload error: ${error instanceof Error ? error.message : "Unknown error"}`);
+        setLoading(false);
+        return;
+      }
     }
 
     // STEP 2 — Save event record to DynamoDB
-    const awsRes = await fetch("/api/events", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: form.title,
-        description: form.description,
-        department: form.department,
-        event_date: form.event_date,
-        image_url: uploadedImageUrl,
-        tags: form.tags.split(",").map(t => t.trim()).filter(Boolean),
-        media_type: form.media_type,
-      }),
-    });
+    const eventData = {
+      title: form.title,
+      description: form.description,
+      department: form.department,
+      event_date: form.event_date,
+      image_url: uploadedImageUrl,
+      tags: form.tags.split(",").map(t => t.trim()).filter(Boolean),
+      media_type: form.media_type,
+    };
 
-    setLoading(false);
+    try {
+      const awsRes = await fetch("/api/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(eventData),
+      });
 
-    if (awsRes.ok) {
-      showToast("Event created successfully!");
-      setTimeout(() => router.push("/admin"), 800);
-    } else {
-      showToast("Error creating event");
+      const awsJson = await awsRes.json();
+
+      setLoading(false);
+
+      if (awsRes.ok) {
+        showToast("Event created successfully!");
+        setTimeout(() => router.push("/admin"), 800);
+      } else {
+        showToast(`Error creating event: ${awsJson.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      setLoading(false);
+      showToast(`Error creating event: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 
@@ -136,7 +159,10 @@ export default function CreateEventPage() {
             <input
               type="file"
               className="hidden"
-              onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+              onChange={(e) => {
+                const selectedFile = e.target.files?.[0] ?? null;
+                setImage(selectedFile);
+              }}
             />
           </label>
 

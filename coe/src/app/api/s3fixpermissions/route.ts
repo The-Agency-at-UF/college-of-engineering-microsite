@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       );
       contentType = getObject.ContentType || contentType;
     } catch {
-      console.warn("Could not get object metadata, using default ContentType");
+      // Use default ContentType if metadata cannot be retrieved
     }
 
     // Method 1: Try CopyObjectCommand (works even when ACLs are disabled)
@@ -62,8 +62,6 @@ export async function POST(req: Request) {
         method: 'CopyObject'
       });
     } catch (copyErr: unknown) {
-      console.warn("CopyObjectCommand failed, trying PutObjectAclCommand:", copyErr);
-      
       // Method 2: Fallback to PutObjectAclCommand
       try {
         await s3.send(
@@ -82,8 +80,6 @@ export async function POST(req: Request) {
           method: 'PutObjectAcl'
         });
       } catch (aclErr: unknown) {
-        console.error("Both methods failed:", { copyErr, aclErr });
-        
         // Provide detailed error message
         const copyError = copyErr as { message?: string; Code?: string; name?: string };
         const aclError = aclErr as { message?: string; Code?: string; name?: string };
@@ -102,7 +98,6 @@ export async function POST(req: Request) {
       }
     }
   } catch (err: unknown) {
-    console.error("S3 fix permissions error:", err);
     const error = err as { message?: string; Code?: string; name?: string };
     return NextResponse.json(
       { 

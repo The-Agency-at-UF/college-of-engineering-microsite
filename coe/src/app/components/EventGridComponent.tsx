@@ -32,7 +32,6 @@ const EventGridComponent = ({
         const eventsData = await ApiClient.getEvents();
         setEvents(eventsData);
       } catch (error) {
-        console.error("❌ Failed to fetch events:", error);
         setError(error instanceof Error ? error.message : "Failed to fetch events");
       } finally {
         setLoading(false);
