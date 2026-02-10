@@ -1,4 +1,4 @@
-Ensure you add .env.local file with credentials:
+In the /coe folder, ensure you add .env.local file with credentials:
 ```
 AWS_REGION=
 AWS_ACCESS_KEY_ID=
