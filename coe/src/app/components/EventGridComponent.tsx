@@ -131,57 +131,44 @@ const EventGridComponent = ({
       </div>
 
       {/* Pagination Controls */}
-      {filteredEvents.length > itemsPerPage && (
-        <div className="flex justify-center items-center gap-4 mt-12">
-          <button
-            onClick={handlePreviousPage}
-            disabled={currentPage === 1}
-            className="px-6 py-2 rounded-md font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: currentPage === 1 ? '#e5e7eb' : '#002657',
-              color: currentPage === 1 ? '#9ca3af' : 'white'
-            }}
-            onMouseEnter={(e) => {
-              if (currentPage > 1) {
-                e.currentTarget.style.backgroundColor = '#001a3d';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (currentPage > 1) {
-                e.currentTarget.style.backgroundColor = '#002657';
-              }
-            }}
-          >
-            Previous
-          </button>
-          
-          <span className="text-[#002657] font-medium">
-            Page {currentPage} of {totalPages}
-          </span>
-          
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="px-6 py-2 rounded-md font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: currentPage === totalPages ? '#e5e7eb' : '#002657',
-              color: currentPage === totalPages ? '#9ca3af' : 'white'
-            }}
-            onMouseEnter={(e) => {
-              if (currentPage < totalPages) {
-                e.currentTarget.style.backgroundColor = '#001a3d';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (currentPage < totalPages) {
-                e.currentTarget.style.backgroundColor = '#002657';
-              }
-            }}
-          >
-            Next
-          </button>
-        </div>
-      )}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-12">
+
+            <button
+              onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-md bg-[#002657] text-white disabled:opacity-40"
+            >
+              ←
+            </button>
+
+            {/* Page Dropdown */}
+            <div className="flex items-center gap-2">
+              <span className="text-[#002657] font-medium">Page</span>
+              <select
+                value={currentPage}
+                onChange={(e) => onPageChange(Number(e.target.value))}
+                className="px-3 py-2 border border-gray-300 rounded-md text-[#002657] font-medium focus:outline-none focus:ring-2 focus:ring-[#FA4616]"
+              >
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+              </select>
+              <span className="text-[#002657] font-medium">of {totalPages}</span>
+            </div>
+
+            <button
+              onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-md bg-[#002657] text-white disabled:opacity-40"
+            >
+              →
+            </button>
+
+          </div>
+        )}
     </section>
   );
 };
