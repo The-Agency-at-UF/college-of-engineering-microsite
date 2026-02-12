@@ -122,10 +122,10 @@ export default function MilestonePage() {
     <main className="min-h-screen flex flex-col bg-white">
       <NavBar />
 
-      {/* Browse over a century banner */}
+      {/* Innovative History All in One Place banner */}
       <section className="relative flex justify-start mt-10">
         <div className="bg-[#0021A5] text-white text-4xl font-bold py-6 px-12 pr-8 rounded-r-[50px] shadow-md">
-          Browse Over a Century of Innovation
+          Innovative History All in One Place
         </div>
       </section>
 
