@@ -51,6 +51,13 @@ export default async function AdminPage() {
         </span>
       </p>
 
+      <Link
+          href="/admin/carousel"
+          className="mb-8 bg-[#0021A5] text-white text-center rounded-full px-34 py-4 hover:bg-[#030533] transition shadow"
+        >
+          Edit Carousel 
+        </Link>
+
       {/* Action Buttons */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12 w-[min(90%,900px)]">
 
