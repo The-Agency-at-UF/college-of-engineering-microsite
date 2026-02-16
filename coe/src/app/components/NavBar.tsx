@@ -38,7 +38,7 @@ export default function NavBar() {
             TIMELINE
           </Link>
           <Link href="/milestone" className="hover:text-[#F2A900] transition-colors">
-          EVENTS
+          MILESTONES
           </Link>
         </nav>
       </div>
