@@ -22,22 +22,24 @@ export const DEPARTMENTS: Department[] = [
 
 // Filter configurations for milestones
 export const MILESTONE_FILTER_CONFIGS = [
-  {
-    id: "themes",
-    label: "THEMES",
-    multiSelect: true,
-    options: [
-      { id: "theme_1", label: "INNOVATION", value: "innovation" },
-      { id: "theme_2", label: "RESEARCH", value: "research" },
-      { id: "theme_3", label: "EDUCATION", value: "education" },
-      { id: "theme_4", label: "INFRASTRUCTURE", value: "infrastructure" },
-      { id: "theme_5", label: "TECHNOLOGY", value: "technology" },
-      { id: "theme_6", label: "SUSTAINABILITY", value: "sustainability" },
-      { id: "theme_7", label: "HEALTHCARE", value: "healthcare" },
-      { id: "theme_8", label: "AEROSPACE", value: "aerospace" },
-      { id: "theme_9", label: "MATERIALS", value: "materials" }
-    ]
-  },
+  // Removed themes filter 
+  // {
+  //   id: "themes",
+  //   label: "THEMES",
+  //   multiSelect: true,
+  //   options: [
+  //     { id: "theme_1", label: "INNOVATION", value: "innovation" },
+  //     { id: "theme_2", label: "RESEARCH", value: "research" },
+  //     { id: "theme_3", label: "EDUCATION", value: "education" },
+  //     { id: "theme_4", label: "INFRASTRUCTURE", value: "infrastructure" },
+  //     { id: "theme_5", label: "TECHNOLOGY", value: "technology" },
+  //     { id: "theme_6", label: "SUSTAINABILITY", value: "sustainability" },
+  //     { id: "theme_7", label: "HEALTHCARE", value: "healthcare" },
+  //     { id: "theme_8", label: "AEROSPACE", value: "aerospace" },
+  //     { id: "theme_9", label: "MATERIALS", value: "materials" }
+  //   ]
+  // },
+
   {
     id: "mediaFormats", 
     label: "MEDIA FORMATS",
