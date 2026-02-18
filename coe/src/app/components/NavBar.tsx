@@ -16,13 +16,18 @@ export default function NavBar() {
       <div className="flex justify-between items-center w-full px-[clamp(16px,3vw,40px)]">
         {/*Left NavBar side: Logo */}
         <div className="flex items-center">
-          <Image
-            src="/images/LEGACY_CoE.svg"
-            alt="Legacy 115th Logo"
-            width={175}
-            height={78}
-            priority
-            className="w-[clamp(80px,9vw,175px)] h-auto"/>
+          <Link href="/">
+            <div className="flex items-center cursor-pointer transition-transform hover:scale-105">
+            <Image
+              src="/images/LEGACY_CoE.svg"
+              alt="Legacy 115th Logo"
+              width={175}
+              height={78}
+              priority
+              className="w-[clamp(80px,9vw,175px)] h-auto"
+            />
+            </div>
+            </Link>
         </div>
 
         {/*Right NavBar side: Nav Links */}
