@@ -116,7 +116,12 @@ export default function MilestonePage() {
     return `/images/pic${placeholderIndex}.jpg`;
   };
 
-
+  // Department list with College of Engineering first + rest sorted alphabetically
+  const departments = [
+    "College of Engineering",
+    ...["ECE", "CHEM", "ABE", "MAE", "MSE", "NE", "ISE", "CISE", "BME", "ESSIE", "EED"]
+      .sort((a, b) => a.localeCompare(b))
+  ];
 
   return (
     <main className="min-h-screen flex flex-col bg-white">
@@ -190,7 +195,7 @@ export default function MilestonePage() {
             }
           }}
         >
-          {["ECE", "CHEM", "ABE", "MAE", "MSE", "NE", "ISE", "CISE", "BME", "ESSIE", "EED"].map((dept, idx) => {
+          {departments.map((dept, idx) => {
             const imagePath = getDeptImage(dept, idx);
             return (
               <button
@@ -218,7 +223,11 @@ export default function MilestonePage() {
                     : 'bg-[rgba(0,38,87,0.7)]'
                 }`} />
                 {/* Text */}
-                <span className="absolute inset-0 z-20 flex items-center justify-center text-white text-6xl italic">
+                <span
+                  className={`absolute inset-0 z-20 flex items-center justify-center text-white italic ${
+                    dept === "College of Engineering" ? "text-5xl" : "text-6xl"
+                  }`}
+                >
                   {dept}
                 </span>
               </button>
