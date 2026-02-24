@@ -9,13 +9,13 @@ import Timeline from "../components/TimelineComponent";
 import EventGridComponent from "../components/EventGridComponent";
 
 export default function Home() {
-  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [visibleEventDates, setVisibleEventDates] = useState<string[]>([]);
   const itemsPerPage = 9;
 
-  const handleDepartmentChange = (department: string | null) => {
-    setSelectedDepartment(department);
+  const handleDepartmentChange = (departments: string[]) => {
+    setSelectedDepartments(departments);
     setCurrentPage(1); // Reset to first page when department changes
   };
 
@@ -29,7 +29,7 @@ export default function Home() {
       {/* Main Content Section */}
       <section className="bg-white">
       <ExcellenceSection 
-        selectedDepartment={selectedDepartment}
+        selectedDepartments={selectedDepartments}
         onDepartmentChange={handleDepartmentChange}
       />
       </section>
@@ -39,7 +39,7 @@ export default function Home() {
         <div className="flex">
           <Timeline visibleEventDates={visibleEventDates} />
           <EventGridComponent 
-            selectedDepartment={selectedDepartment}
+            selectedDepartments={selectedDepartments}
             currentPage={currentPage}
             itemsPerPage={itemsPerPage}
             onPageChange={setCurrentPage}
