@@ -6,7 +6,7 @@ import { Event } from "../lib/fakeApiData";
 import { ApiClient } from "../lib/apiClient";
 
 interface EventGridComponentProps {
-  selectedDepartment?: string | null;
+  selectedDepartments?: string[];
   currentPage: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
@@ -15,7 +15,7 @@ interface EventGridComponentProps {
 }
 
 const EventGridComponent = ({ 
-  selectedDepartment,
+  selectedDepartments,
   currentPage,
   itemsPerPage,
   onPageChange,
@@ -43,12 +43,12 @@ const EventGridComponent = ({
 
   // Filter events by selected department
   const filteredEvents = useMemo(() => {
-    if (!selectedDepartment) return events;
+    if (!selectedDepartments || selectedDepartments.length === 0) return events;
     
     return events.filter(event => 
-      event.department.toUpperCase() === selectedDepartment.toUpperCase()
+      selectedDepartments.includes(event.department.toUpperCase())
     );
-  }, [events, selectedDepartment]);
+  }, [events, selectedDepartments]);
 
   // Update total items when filtered events change
   useEffect(() => {
@@ -122,8 +122,8 @@ const EventGridComponent = ({
           ))
         ) : (
           <div className="col-span-full text-center py-12 text-[#002657] text-lg">
-            {selectedDepartment ? 
-              `No events available for ${selectedDepartment}` : 
+            {selectedDepartments && selectedDepartments.length > 0 ? 
+              `No events available for the selected department(s)` : 
               'No events available'
             }
           </div>
