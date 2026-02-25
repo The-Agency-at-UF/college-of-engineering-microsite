@@ -15,15 +15,29 @@ export default function MilestonePage() {
   const [filterState, setFilterState] = useState<FilterState>({});
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const [departmentImages, setDepartmentImages] = useState<string[]>([]);
+  const [deptImagesLoading, setDeptImagesLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
   // Fetch department images - must be called before any conditional returns
   useEffect(() => {
     fetch("/api/departments")
-      .then((res) => res.json())
-      .then((data: string[]) => setDepartmentImages(data))
-      .catch(() => setDepartmentImages([]));
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`API responded with status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data: string[]) => {
+        setDepartmentImages(data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch department images:", err);
+        setDepartmentImages([]);
+      })
+      .finally(() => {
+        setDeptImagesLoading(false);
+      });
   }, []);
 
   const handleFilterChange = (filterId: string, selectedValues: string[]) => {
@@ -35,15 +49,22 @@ export default function MilestonePage() {
   };
 
   const handleDepartmentClick = (department: string) => {
-    setSelectedDepartment(department);
+    if (department === "College of Engineering") {
+      setSelectedDepartment(null);
+    } else {
+      setSelectedDepartment(department);
+    }
     setCurrentPage(1); // Reset to first page when department changes
   };
 
   // Define how to filter milestones based on selected filters AND department
   const filterMilestones = (milestone: Milestone, filters: FilterState): boolean => {
     // First check department filter
-    if (selectedDepartment && milestone.department?.toUpperCase() !== selectedDepartment) {
-      return false;
+    if (selectedDepartment) {
+      // A simple `includes` check should work for mapping codes like "ECE" to "Electrical & Computer Engineering"
+      if (!milestone.department || !milestone.department.toUpperCase().includes(selectedDepartment.toUpperCase())) {
+        return false;
+      }
     }
 
     // If no other filters selected, show all milestones (filtered by department if selected)
@@ -98,14 +119,21 @@ export default function MilestonePage() {
 
   // Match department names to images, with placeholder fallback
   const getDeptImage = (dept: string, index: number) => {
-    // First try to find the actual department image
-    const deptImage = departmentImages.find((img) => {
-      // Extract filename from path and normalize
-      const filename = img.split('/').pop()?.toLowerCase().replace(/\s/g, "").replace(/\.(jpg|jpeg|png|gif)$/i, "") || "";
-      const deptNormalized = dept.toLowerCase().replace(/\s/g, "");
-      return filename.includes(deptNormalized) || deptNormalized.includes(filename);
+    const deptImage = departmentImages.find((imgUrl) => {
+      const deptUpper = dept.toUpperCase();
+      const urlUpper = imgUrl.toUpperCase();
+      const pathSegments = urlUpper.split('/');
+      const filename = pathSegments.pop() || '';
+      
+      // Primary matching strategy: Check if the department code is a folder in the URL path.
+      if (urlUpper.includes(`/${deptUpper}/`)) {
+        return true;
+      }
+
+      // Fallback strategy: Check if the filename starts with the department code.
+      return filename.startsWith(deptUpper);
     });
-    
+
     // If found, return it; otherwise use a placeholder
     if (deptImage) {
       return deptImage;
@@ -195,44 +223,52 @@ export default function MilestonePage() {
             }
           }}
         >
-          {departments.map((dept, idx) => {
-            const imagePath = getDeptImage(dept, idx);
-            return (
-              <button
-                key={idx}
-                onClick={() => handleDepartmentClick(dept)}
-                className={`relative flex-shrink-0 w-80 h-50 rounded-xl cursor-pointer overflow-hidden transition ${
-                  selectedDepartment === dept
-                    ? 'ring-4 ring-[#FA4616] shadow-lg' 
-                    : 'hover:ring-2 hover:ring-[#002657]'
-                }`}
-              >
-                {/* Image */}
-                <Image
-                  src={imagePath}
-                  alt={dept}
-                  fill
-                  className="object-cover z-0"
-                  sizes="(max-width: 768px) 100vw, 20vw"
-                  onError={(e) => (e.target as HTMLImageElement).style.display = "none"}
+          {deptImagesLoading
+            ? // Render skeleton loaders while images are being fetched
+              Array.from({ length: departments.length }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="flex-shrink-0 w-80 h-50 rounded-xl bg-gray-200 animate-pulse"
                 />
-                {/* Overlay */}
-                <div className={`absolute inset-0 z-10 ${
-                  selectedDepartment === dept
-                    ? 'bg-[rgba(250,70,22,0.7)]' 
-                    : 'bg-[rgba(0,38,87,0.7)]'
-                }`} />
-                {/* Text */}
-                <span
-                  className={`absolute inset-0 z-20 flex items-center justify-center text-white italic ${
-                    dept === "College of Engineering" ? "text-5xl" : "text-6xl"
-                  }`}
-                >
-                  {dept}
-                </span>
-              </button>
-            );
-          })}
+              ))
+            : // Render the actual department buttons once images are loaded
+              departments.map((dept, idx) => {
+                const imagePath = getDeptImage(dept, idx);
+                const isSelected = selectedDepartment === dept || (selectedDepartment === null && dept === "College of Engineering");
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleDepartmentClick(dept)}
+                    className={`relative flex-shrink-0 w-80 h-50 rounded-xl cursor-pointer overflow-hidden transition ${isSelected
+                        ? 'ring-4 ring-[#FA4616] shadow-lg' 
+                        : 'hover:ring-2 hover:ring-[#002657]'
+                    }`}
+                  >
+                    {/* Image */}
+                    <Image
+                      src={imagePath}
+                      alt={dept}
+                      fill
+                      className="object-cover z-0"
+                      sizes="(max-width: 768px) 100vw, 20vw"
+                      onError={(e) => (e.target as HTMLImageElement).style.display = "none"}
+                    />
+                    {/* Overlay */}
+                    <div className={`absolute inset-0 z-10 ${isSelected
+                        ? 'bg-[rgba(250,70,22,0.7)]' 
+                        : 'bg-[rgba(0,38,87,0.7)]'
+                    }`} />
+                    {/* Text */}
+                    <span
+                      className={`absolute inset-0 z-20 flex items-center justify-center text-white italic ${
+                        dept === "College of Engineering" ? "text-5xl" : "text-6xl"
+                      }`}
+                    >
+                      {dept}
+                    </span>
+                  </button>
+                );
+              })}
         </div>
       </section>
 
