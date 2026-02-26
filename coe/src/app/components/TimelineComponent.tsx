@@ -16,7 +16,7 @@ export default function Timeline({ visibleEventDates }: TimelineProps) {
   }, []);
 
   const totalDecades = decades.length; // 12 decades
-  const timelineHeight = 722; // Matches Figma: 722px
+  const timelineHeight = 722; 
 
   const extractYear = (date: string): number | null => {
     const yearMatch = date.match(/^(\d{4})/);
@@ -54,6 +54,9 @@ export default function Timeline({ visibleEventDates }: TimelineProps) {
     };
   }, [visibleYearRange, totalDecades, timelineHeight]);
 
+  // 2015 is halfway between the 2020s tick (index 0) and 2010s tick (index 1)
+  const star2015Top = (0.5 / totalDecades) * timelineHeight - 23;
+
   return (
     <aside className="p-30 flex flex-col items-center z-50">
       <div
@@ -74,9 +77,6 @@ export default function Timeline({ visibleEventDates }: TimelineProps) {
 
         {/*
           TOP ARROW CAP
-          Two lines forming an upward-pointing chevron (open arrow, not filled).
-          40px wide × 16px tall, centered on the 6px stem.
-          Uses two strokes meeting at a point at the top-center.
         */}
         <div
           className="absolute"
@@ -132,6 +132,19 @@ export default function Timeline({ visibleEventDates }: TimelineProps) {
               <div className="w-[16px] h-[8px]" style={{ backgroundColor: '#002657' }} />
             </div>
           ))}
+        </div>
+
+        {/* Yellow star at 2015 level */}
+        <div
+          className="absolute"
+          style={{
+            left: '26px',
+            top: `${star2015Top}px`,
+          }}
+        >
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="#FFD700" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+          </svg>
         </div>
 
         {/* Decade labels */}
