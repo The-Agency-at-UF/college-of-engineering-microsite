@@ -5,72 +5,67 @@ import Image from "next/image";
 import Footer from "../components/Footer";
 import NavBar from "../components/NavBar";
 import MilestoneCard from "../components/MilestoneComponent";
-import { FilterSystem, FilterState } from "../components/FilterSystem";
-import { MILESTONE_FILTER_CONFIGS } from "../lib/constants";
 import { useMilestones } from "../lib/hooks";
 import { Milestone } from "../lib/fakeApiData";
 
 export default function MilestonePage() {
   const { milestones, loading, error } = useMilestones();
-  const [filterState, setFilterState] = useState<FilterState>({});
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const [departmentImages, setDepartmentImages] = useState<string[]>([]);
+  const [deptImagesLoading, setDeptImagesLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
   // Fetch department images - must be called before any conditional returns
   useEffect(() => {
     fetch("/api/departments")
-      .then((res) => res.json())
-      .then((data: string[]) => setDepartmentImages(data))
-      .catch(() => setDepartmentImages([]));
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`API responded with status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data: string[]) => {
+        setDepartmentImages(data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch department images:", err);
+        setDepartmentImages([]);
+      })
+      .finally(() => {
+        setDeptImagesLoading(false);
+      });
   }, []);
 
-  const handleFilterChange = (filterId: string, selectedValues: string[]) => {
-    setFilterState(prev => ({
-      ...prev,
-      [filterId]: selectedValues
-    }));
-    setCurrentPage(1); // Reset to first page when filters change
-  };
-
   const handleDepartmentClick = (department: string) => {
-    setSelectedDepartment(department);
+    if (department === "College of Engineering") {
+      setSelectedDepartment(null);
+    } else {
+      setSelectedDepartment(department);
+    }
     setCurrentPage(1); // Reset to first page when department changes
   };
 
-  // Define how to filter milestones based on selected filters AND department
-  const filterMilestones = (milestone: Milestone, filters: FilterState): boolean => {
-    // First check department filter
-    if (selectedDepartment && milestone.department?.toUpperCase() !== selectedDepartment) {
-      return false;
-    }
-
-    // If no other filters selected, show all milestones (filtered by department if selected)
-    if (Object.keys(filters).length === 0) return true;
-
-    // Check themes filter
-    if (filters.themes && filters.themes.length > 0) {
-      const hasMatchingTheme = milestone.themes?.some(theme => 
-        filters.themes.includes(theme)
-      );
-      if (!hasMatchingTheme) return false;
-    }
-
-    // Check media formats filter - use media_type field which is what's actually stored
-    if (filters.mediaFormats && filters.mediaFormats.length > 0) {
-      // Check both media_type (actual API field) and media_format (legacy/mock field) for compatibility
-      const milestoneMediaType = (milestone.media_type || (milestone as any).media_format || "image")?.toLowerCase();
-      const matchingFilter = filters.mediaFormats.some(filterValue => 
-        filterValue.toLowerCase() === milestoneMediaType
-      );
-      if (!matchingFilter) {
+  // Define how to filter milestones based on department
+  const filterMilestones = (milestone: Milestone): boolean => {
+    // Check department filter
+    if (selectedDepartment) {
+      // A simple `includes` check should work for mapping codes like "ECE" to "Electrical & Computer Engineering"
+      if (!milestone.department || !milestone.department.toUpperCase().includes(selectedDepartment.toUpperCase())) {
         return false;
       }
     }
 
     return true;
   };
+
+  const filteredMilestones = milestones.filter(filterMilestones);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredMilestones.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedMilestones = filteredMilestones.slice(startIndex, endIndex);
 
   if (loading) {
     return (
@@ -98,14 +93,21 @@ export default function MilestonePage() {
 
   // Match department names to images, with placeholder fallback
   const getDeptImage = (dept: string, index: number) => {
-    // First try to find the actual department image
-    const deptImage = departmentImages.find((img) => {
-      // Extract filename from path and normalize
-      const filename = img.split('/').pop()?.toLowerCase().replace(/\s/g, "").replace(/\.(jpg|jpeg|png|gif)$/i, "") || "";
-      const deptNormalized = dept.toLowerCase().replace(/\s/g, "");
-      return filename.includes(deptNormalized) || deptNormalized.includes(filename);
+    const deptImage = departmentImages.find((imgUrl) => {
+      const deptUpper = dept.toUpperCase();
+      const urlUpper = imgUrl.toUpperCase();
+      const pathSegments = urlUpper.split('/');
+      const filename = pathSegments.pop() || '';
+      
+      // Primary matching strategy: Check if the department code is a folder in the URL path.
+      if (urlUpper.includes(`/${deptUpper}/`)) {
+        return true;
+      }
+
+      // Fallback strategy: Check if the filename starts with the department code.
+      return filename.startsWith(deptUpper);
     });
-    
+
     // If found, return it; otherwise use a placeholder
     if (deptImage) {
       return deptImage;
@@ -117,20 +119,33 @@ export default function MilestonePage() {
   };
 
   // Department list with College of Engineering first + rest sorted alphabetically
+  const departmentMap: { [key: string]: string } = {
+    "ECE": "Electrical & Computer Engineering",
+    "CHEM": "Chemical Engineering",
+    "ABE": "Agricultural & Biological Engineering",
+    "MAE": "Mechanical & Aerospace Engineering",
+    "MSE": "Materials Science Engineering",
+    "NE": "Nuclear Engineering",
+    "ISE": "Industrial Systems Engineering",
+    "CISE": "Computer & Information Science Engineering",
+    "BME": "Biomedical Engineering",
+    "ESSIE": "Engineering School of Sustainable Infrastructure & Environment",
+    "EED": "Engineering Education",
+  };
+
   const departments = [
     "College of Engineering",
-    ...["ECE", "CHEM", "ABE", "MAE", "MSE", "NE", "ISE", "CISE", "BME", "ESSIE", "EED"]
-      .sort((a, b) => a.localeCompare(b))
+    ...Object.keys(departmentMap).sort((a, b) => a.localeCompare(b))
   ];
 
   return (
     <main className="min-h-screen flex flex-col bg-white">
       <NavBar />
 
-      {/* Innovative History All in One Place banner */}
+      {/* Title banner */}
       <section className="relative flex justify-start mt-10">
         <div className="bg-[#0021A5] text-white text-4xl font-bold py-6 px-12 pr-8 rounded-r-[50px] shadow-md">
-          Innovative History All in One Place
+          Our Legacy: Pioneers, Progress, and Purpose
         </div>
       </section>
 
@@ -195,44 +210,51 @@ export default function MilestonePage() {
             }
           }}
         >
-          {departments.map((dept, idx) => {
-            const imagePath = getDeptImage(dept, idx);
-            return (
-              <button
-                key={idx}
-                onClick={() => handleDepartmentClick(dept)}
-                className={`relative flex-shrink-0 w-80 h-50 rounded-xl cursor-pointer overflow-hidden transition ${
-                  selectedDepartment === dept
-                    ? 'ring-4 ring-[#FA4616] shadow-lg' 
-                    : 'hover:ring-2 hover:ring-[#002657]'
-                }`}
-              >
-                {/* Image */}
-                <Image
-                  src={imagePath}
-                  alt={dept}
-                  fill
-                  className="object-cover z-0"
-                  sizes="(max-width: 768px) 100vw, 20vw"
-                  onError={(e) => (e.target as HTMLImageElement).style.display = "none"}
+          {deptImagesLoading
+            ? // Render skeleton loaders while images are being fetched
+              Array.from({ length: departments.length }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="flex-shrink-0 w-80 h-50 rounded-xl bg-gray-200 animate-pulse"
                 />
-                {/* Overlay */}
-                <div className={`absolute inset-0 z-10 ${
-                  selectedDepartment === dept
-                    ? 'bg-[rgba(250,70,22,0.7)]' 
-                    : 'bg-[rgba(0,38,87,0.7)]'
-                }`} />
-                {/* Text */}
-                <span
-                  className={`absolute inset-0 z-20 flex items-center justify-center text-white italic ${
-                    dept === "College of Engineering" ? "text-5xl" : "text-6xl"
-                  }`}
-                >
-                  {dept}
-                </span>
-              </button>
-            );
-          })}
+              ))
+            : // Render the actual department buttons once images are loaded
+              departments.map((dept, idx) => {
+                const displayName = departmentMap[dept] || dept;
+                const imagePath = getDeptImage(dept, idx);
+                const isSelected = selectedDepartment === dept || (selectedDepartment === null && dept === "College of Engineering");
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleDepartmentClick(dept)}
+                    className={`relative flex-shrink-0 w-80 h-50 rounded-xl cursor-pointer overflow-hidden transition ${ isSelected
+                        ? 'ring-4 ring-[#FA4616] shadow-lg' 
+                        : 'hover:ring-2 hover:ring-[#002657]'
+                    }`}
+                  >
+                    {/* Image */}
+                    <Image
+                      src={imagePath}
+                      alt={displayName}
+                      fill
+                      className="object-cover z-0"
+                      sizes="(max-width: 768px) 100vw, 20vw"
+                      onError={(e) => (e.target as HTMLImageElement).style.display = "none"}
+                    />
+                    {/* Overlay */}
+                    <div className={`absolute inset-0 z-10 ${ isSelected
+                        ? 'bg-[rgba(250,70,22,0.7)]' 
+                        : 'bg-[rgba(0,38,87,0.7)]'
+                    }`} />
+                    {/* Text */}
+                    <span
+                      className="absolute inset-0 z-20 flex items-center justify-center p-4 text-center text-2xl font-bold italic leading-tight text-white"
+                    >
+                      {displayName}
+                    </span>
+                  </button>
+                );
+              })}
         </div>
       </section>
 
@@ -250,111 +272,76 @@ export default function MilestonePage() {
       {/* Divider */}
       <div className="h-[4px] bg-[#FA4616] mx-8 mt-4 rounded-full" />
 
-      {/* Filtering System with Milestone Grid */}
+      {/* Milestone Grid with Pagination */}
       <section className="w-full py-20 px-8 bg-white">
-        <FilterSystem
-          items={milestones}
-          filterConfigs={MILESTONE_FILTER_CONFIGS}
-          filterState={filterState}
-          onFilterChange={handleFilterChange}
-          filterFunction={filterMilestones}
-          filterControlsClassName="flex gap-4 mb-6 justify-end"
-        >
-          {(filteredMilestones) => {
-            // Calculate pagination
-            const totalPages = Math.ceil(filteredMilestones.length / itemsPerPage);
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const paginatedMilestones = filteredMilestones.slice(startIndex, endIndex);
-
-            const handlePreviousPage = () => {
-              if (currentPage > 1) {
-                setCurrentPage(currentPage - 1);
+        <div className="grid gap-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 place-items-center">
+          {paginatedMilestones.length > 0 ? (
+            paginatedMilestones.map((milestone: Milestone) => {
+              // Check multiple possible field names for media URL (image_url, media_url, video_url)
+              const mediaUrl = milestone.image_url || 
+                               (milestone as any).media_url || 
+                               (milestone as any).video_url || 
+                               "/images/pic1.jpg";
+              
+              return (
+                <MilestoneCard
+                  key={milestone.milestone_id || Math.random()}
+                  id={milestone.milestone_id || String(Math.random())}
+                  imageSrc={mediaUrl}
+                  title={milestone.title}
+                  tags={milestone.themes || []}
+                  description={milestone.description}
+                  media_type={(milestone.media_type || (milestone as any).media_format || "image")}
+                />
+              );
+            })
+          ) : (
+            <div className="col-span-full text-center py-12 text-[#002657] text-lg">
+              {selectedDepartment ? 
+                `No milestones found for ${selectedDepartment}` :
+                'No milestones found'
               }
-            };
+            </div>
+          )}
+        </div>
 
-            const handleNextPage = () => {
-              if (currentPage < totalPages) {
-                setCurrentPage(currentPage + 1);
-              }
-            };
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-12">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-md bg-[#002657] text-white disabled:opacity-40"
+            >
+              ←
+            </button>
 
-            return (
-              <>
-                <div className="grid gap-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 place-items-center">
-                  {paginatedMilestones.length > 0 ? (
-                    paginatedMilestones.map((milestone) => {
-                      // Check multiple possible field names for media URL (image_url, media_url, video_url)
-                      const mediaUrl = milestone.image_url || 
-                                       (milestone as any).media_url || 
-                                       (milestone as any).video_url || 
-                                       "/images/pic1.jpg";
-                      
-                      return (
-                        <MilestoneCard
-                          key={milestone.milestone_id || Math.random()}
-                          id={milestone.milestone_id || String(Math.random())}
-                          imageSrc={mediaUrl}
-                          title={milestone.title}
-                          tags={milestone.themes || []}
-                          description={milestone.description}
-                          media_type={(milestone.media_type || (milestone as any).media_format || "image")}
-                        />
-                      );
-                    })
-                  ) : (
-                    <div className="col-span-full text-center py-12 text-[#002657] text-lg">
-                      {selectedDepartment ? 
-                        `No milestones found for ${selectedDepartment} ${Object.keys(filterState).length > 0 ? 'matching the selected filters' : ''}` :
-                        'No milestones found matching the selected filters'
-                      }
-                    </div>
-                  )}
-                </div>
+            {/* Page Dropdown */}
+            <div className="flex items-center gap-2">
+              <span className="text-[#002657] font-medium">Page</span>
+              <select
+                value={currentPage}
+                onChange={(e) => setCurrentPage(Number(e.target.value))}
+                className="px-3 py-2 border border-gray-300 rounded-md text-[#002657] font-medium focus:outline-none focus:ring-2 focus:ring-[#FA4616]"
+              >
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+              </select>
+              <span className="text-[#002657] font-medium">of {totalPages}</span>
+            </div>
 
-                {/* Pagination Controls */}
-                  {totalPages > 1 && (
-                    <div className="flex justify-center items-center gap-4 mt-12">
-
-                      <button
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                        className="px-4 py-2 rounded-md bg-[#002657] text-white disabled:opacity-40"
-                      >
-                        ←
-                      </button>
-
-                      {/* Page Dropdown */}
-                      <div className="flex items-center gap-2">
-                        <span className="text-[#002657] font-medium">Page</span>
-                        <select
-                          value={currentPage}
-                          onChange={(e) => setCurrentPage(Number(e.target.value))}
-                          className="px-3 py-2 border border-gray-300 rounded-md text-[#002657] font-medium focus:outline-none focus:ring-2 focus:ring-[#FA4616]"
-                        >
-                          {Array.from({ length: totalPages }, (_, i) => (
-                            <option key={i + 1} value={i + 1}>
-                              {i + 1}
-                            </option>
-                          ))}
-                        </select>
-                        <span className="text-[#002657] font-medium">of {totalPages}</span>
-                      </div>
-
-                      <button
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                        disabled={currentPage === totalPages}
-                        className="px-4 py-2 rounded-md bg-[#002657] text-white disabled:opacity-40"
-                      >
-                        →
-                      </button>
-
-                    </div>
-                  )}
-              </>
-            );
-          }}
-        </FilterSystem>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-md bg-[#002657] text-white disabled:opacity-40"
+            >
+              →
+            </button>
+          </div>
+        )}
       </section>
 
       <Footer />
