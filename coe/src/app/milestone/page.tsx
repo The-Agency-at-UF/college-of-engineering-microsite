@@ -145,10 +145,23 @@ export default function MilestonePage() {
   };
 
   // Department list with College of Engineering first + rest sorted alphabetically
+  const departmentMap: { [key: string]: string } = {
+    "ECE": "Electrical & Computer Engineering",
+    "CHEM": "Chemical Engineering",
+    "ABE": "Agricultural & Biological Engineering",
+    "MAE": "Mechanical & Aerospace Engineering",
+    "MSE": "Materials Science Engineering",
+    "NE": "Nuclear Engineering",
+    "ISE": "Industrial Systems Engineering",
+    "CISE": "Computer & Information Science Engineering",
+    "BME": "Biomedical Engineering",
+    "ESSIE": "Engineering School of Sustainable Infrastructure & Environment",
+    "EED": "Engineering Education",
+  };
+
   const departments = [
     "College of Engineering",
-    ...["ECE", "CHEM", "ABE", "MAE", "MSE", "NE", "ISE", "CISE", "BME", "ESSIE", "EED"]
-      .sort((a, b) => a.localeCompare(b))
+    ...Object.keys(departmentMap).sort((a, b) => a.localeCompare(b))
   ];
 
   return (
@@ -233,13 +246,14 @@ export default function MilestonePage() {
               ))
             : // Render the actual department buttons once images are loaded
               departments.map((dept, idx) => {
+                const displayName = departmentMap[dept] || dept;
                 const imagePath = getDeptImage(dept, idx);
                 const isSelected = selectedDepartment === dept || (selectedDepartment === null && dept === "College of Engineering");
                 return (
                   <button
                     key={idx}
                     onClick={() => handleDepartmentClick(dept)}
-                    className={`relative flex-shrink-0 w-80 h-50 rounded-xl cursor-pointer overflow-hidden transition ${isSelected
+                    className={`relative flex-shrink-0 w-80 h-50 rounded-xl cursor-pointer overflow-hidden transition ${ isSelected
                         ? 'ring-4 ring-[#FA4616] shadow-lg' 
                         : 'hover:ring-2 hover:ring-[#002657]'
                     }`}
@@ -247,24 +261,22 @@ export default function MilestonePage() {
                     {/* Image */}
                     <Image
                       src={imagePath}
-                      alt={dept}
+                      alt={displayName}
                       fill
                       className="object-cover z-0"
                       sizes="(max-width: 768px) 100vw, 20vw"
                       onError={(e) => (e.target as HTMLImageElement).style.display = "none"}
                     />
                     {/* Overlay */}
-                    <div className={`absolute inset-0 z-10 ${isSelected
+                    <div className={`absolute inset-0 z-10 ${ isSelected
                         ? 'bg-[rgba(250,70,22,0.7)]' 
                         : 'bg-[rgba(0,38,87,0.7)]'
                     }`} />
                     {/* Text */}
                     <span
-                      className={`absolute inset-0 z-20 flex items-center justify-center text-white italic ${
-                        dept === "College of Engineering" ? "text-5xl" : "text-6xl"
-                      }`}
+                      className="absolute inset-0 z-20 flex items-center justify-center p-4 text-center text-2xl font-bold italic leading-tight text-white"
                     >
-                      {dept}
+                      {displayName}
                     </span>
                   </button>
                 );
