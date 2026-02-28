@@ -96,16 +96,16 @@ export default function HerbiePage() {
           />
         </div>
         <section className="bg-white relative -mt-[clamp(25px,3.618vw,55px)] px-[clamp(30px,4.8vw,73px)] pt-[clamp(15px,1.842vw,28px)] pb-[clamp(40px,5.26vw,80px)]">
-          <h1
-            className="font-bold text-[#0021A5] uppercase leading-none max-w-[910px] text-[clamp(24px,3.158vw,48px)]"
-          >
-            THE WERTHEIM TRANSFORMATION
-          </h1>
           <h2
-            className="font-bold text-[#0021A5] uppercase leading-none max-w-[820px] mt-[clamp(10px,1.315vw,20px)] text-[clamp(24px,3.158vw,48px)]"
+            className="font-bold text-[#0021A5] uppercase leading-none max-w-[875px] mt-[clamp(10px,1.315vw,20px)] text-[clamp(24px,3.158vw,48px)]"
           >
-            DR. HERBERT "HERBIE" WERTHEIM
+            Herbert Werthem: The Vision. The Transformation. The Impact.
           </h2>
+          <h1
+            className="font-bold text-[#002657] max-w-[850px] text-[clamp(20px,1.579vw,32px)] pt-[clamp(6px,0.5vw,12px)]"
+          >
+            Honoring the gift, leadership and lasting impact of Dr. Herbert “Herbie” Wertheim, founding chairman of the college since Oct 1, 2015
+          </h1>
           <Image 
             src="/images/subhead-underline.svg"
             alt=""
