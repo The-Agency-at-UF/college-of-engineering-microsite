@@ -7,6 +7,7 @@ export default function NavBar() {
     //nav bar and gold border-b styling
     <header
       className="
+        relative z-10
         flex items-center
         h-[clamp(80px,10vw,120px)]
         bg-gradient-to-r from-[#002657] to-[#0021A5]
@@ -41,6 +42,9 @@ export default function NavBar() {
 
           <Link href="/timeline" className="hover:text-[#F2A900] transition-colors">
             TIMELINE
+          </Link>
+          <Link href="/herbie" className="hover:text-[#F2A900] transition-colors">
+          THE WERTHEIM TRANSFORMATION
           </Link>
           <Link href="/milestone" className="hover:text-[#F2A900] transition-colors">
           MILESTONES
