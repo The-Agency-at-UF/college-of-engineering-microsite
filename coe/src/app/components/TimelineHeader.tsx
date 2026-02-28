@@ -31,8 +31,8 @@ export default function TimelineHeader() {
                 className="w-[clamp(200px,25vw,400px)] h-auto"
               />
             </div>
-            <h3 className="text-[clamp(10px,1.7vw,30px)] text-orange-400 font-bold italic leading-[1]">
-              ENGINEERING THE FUTURE 
+            <h3 className="text-[clamp(16px,3vw,48px)] max-w-lg text-orange-400 font-bold italic leading-[1]">
+              Engineering the future, creating our Legacy 
             </h3>
           </div>
         </div>
