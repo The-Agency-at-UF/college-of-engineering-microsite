@@ -40,11 +40,11 @@ export default function NavBar() {
           text-white font-semibold
           text-[clamp(10px,1.5vw,24px)]">
 
+          <Link href="/herbie" className="hover:text-[#F2A900] transition-colors">
+            THE WERTHEIM TRANSFORMATION
+          </Link>
           <Link href="/timeline" className="hover:text-[#F2A900] transition-colors">
             TIMELINE
-          </Link>
-          <Link href="/herbie" className="hover:text-[#F2A900] transition-colors">
-          THE WERTHEIM TRANSFORMATION
           </Link>
           <Link href="/milestone" className="hover:text-[#F2A900] transition-colors">
           MILESTONES
